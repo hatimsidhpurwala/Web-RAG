@@ -142,11 +142,12 @@ class RAGAgent:
             "pdf", "document", "uploaded", "file", "datasheet",
             "the data", "this data", "above data", "attached",
             "right now", "this file", "the file", "i sent", "i shared",
-            "just uploaded",
+            "just uploaded", "doc", "specification", "spec sheet",
         )
         _vague_doc_phrases = (
             "what is it about", "summarize", "tell me about",
             "what does it say", "what is this about", "what is the pdf",
+            "explain the", "explain this", "overview of",
         )
         has_active_docs = bool(active_doc_sites)
         q_lower = enhanced_question.lower()
@@ -154,7 +155,22 @@ class RAGAgent:
         if has_active_docs and any(p in q_lower for p in _vague_doc_phrases):
             is_document_q = True
 
+        # When multiple PDFs are active, check if the user named a specific one
+        # e.g. "the SALTO keycard pdf" → restrict to pdf_Datasheet-SALTO...
+        specific_prefix: Optional[str] = None
+        if has_active_docs and len(active_doc_sites) > 1:
+            for site in active_doc_sites:
+                # Strip "pdf_" prefix to get the filename stem
+                stem = site.replace("pdf_", "").lower()
+                # Check if any significant word (>4 chars) from the stem appears in the question
+                stem_words = [w for w in stem.replace("-", " ").replace("_", " ").split() if len(w) > 4]
+                if any(word in q_lower for word in stem_words):
+                    specific_prefix = site  # exact site match → filter to that one doc
+                    logger.info("Specific PDF referenced: %s", site)
+                    break
+
         # source_prefix="pdf_" tells the retriever node to filter by that prefix
+        # specific_prefix is an exact site_name (used for single-doc questions with multiple active)
         source_prefix: Optional[str] = (
             "pdf_" if (is_document_q and has_active_docs) else None
         )
@@ -163,6 +179,7 @@ class RAGAgent:
                 "Document question detected – restricting retrieval to '%s' "
                 "(active docs: %s)", source_prefix, active_doc_sites,
             )
+
 
         # ── 4. Build initial state and run graph ────────────────────────
         initial_state: AgentState = {

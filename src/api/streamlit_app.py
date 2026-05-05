@@ -443,17 +443,46 @@ with st.sidebar:
     st.markdown("*An intelligent assistant that automatically researches, verifies facts, and learns from every conversation.*")
     st.divider()
 
-    # File upload
+    # File upload — multiple files supported
     st.markdown("### 📁 Upload Files")
-    uploaded_file = st.file_uploader(
-        "Drop a PDF, image, or document",
+    uploaded_files = st.file_uploader(
+        "Drop PDFs, images, or documents (multiple allowed)",
         type=["pdf", "png", "jpg", "jpeg", "bmp", "tiff", "webp", "docx"],
         key="file_upload",
+        accept_multiple_files=True,
     )
-    if uploaded_file:
-        result = process_input("", file=uploaded_file, force_reindex=True)
-        for action in result["actions_taken"]:
-            st.success(action)
+
+
+    # Track which file names we've already processed this session
+    # so we only re-index when a NEW file is added, not on every rerun
+    if "_processed_file_names" not in st.session_state:
+        st.session_state._processed_file_names: set = set()
+
+    if uploaded_files:
+        for uf in uploaded_files:
+            file_key = f"{uf.name}_{uf.size}"
+            is_new   = file_key not in st.session_state._processed_file_names
+            result   = process_input("", file=uf, force_reindex=is_new)
+            for action in result["actions_taken"]:
+                if is_new:
+                    st.success(action)
+                else:
+                    st.caption(f"✓ {action}")
+            if is_new:
+                st.session_state._processed_file_names.add(file_key)
+
+    # ── Active Documents panel ──────────────────────────────────
+    active_docs = st.session_state.get("active_doc_sites", [])
+    if active_docs:
+        st.markdown("**📂 Active Documents this session:**")
+        for doc in active_docs:
+            # Show just the filename part (strip pdf_ prefix)
+            label = doc.replace("pdf_", "").replace("img_", "")
+            st.markdown(f"&nbsp;&nbsp;📄 `{label}`", unsafe_allow_html=True)
+        if st.button("🗑️ Clear active documents", use_container_width=True):
+            st.session_state.active_doc_sites = []
+            st.session_state._processed_file_names = set()
+            st.rerun()
 
     st.divider()
 
