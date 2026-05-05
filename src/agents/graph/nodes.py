@@ -167,7 +167,34 @@ def make_node_web_search(vector_store: "VectorStore"):
             "Web search triggered (confidence=%.2f)", state.get("confidence", 0)
         )
         try:
-            info = search_and_scrape(state["question"], vector_store)
+            queries = state.get("generated_queries", [state["question"]])
+            # Run max 2 optimized queries to keep response time reasonable
+            queries_to_run = queries[:2]
+            
+            all_sites = []
+            all_raw = []
+            total_chunks = 0
+            
+            for q in queries_to_run:
+                logger.info("Executing web search for optimized query: '%s'", q)
+                info_q = search_and_scrape(q, vector_store, max_results=3)
+                all_sites.extend(info_q["sites_indexed"])
+                all_raw.extend(info_q.get("raw_results", []))
+                total_chunks += info_q["total_chunks"]
+                
+            # De-duplicate raw results by URL
+            seen_urls = set()
+            deduped_raw = []
+            for r in all_raw:
+                if r["url"] not in seen_urls:
+                    seen_urls.add(r["url"])
+                    deduped_raw.append(r)
+                    
+            info = {
+                "sites_indexed": all_sites,
+                "total_chunks": total_chunks,
+                "raw_results": deduped_raw
+            }
         except Exception as exc:
             logger.error("Web search failed: %s", exc)
             info = {"sites_indexed": [], "total_chunks": 0, "raw_results": []}

@@ -4,7 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "hatim.jk pdf",
         "the uploaded PDF",
         "research_paper PDF",
         "PDF datasheet",
@@ -23,9 +22,10 @@
         "SALTO keycards",
         "SALTO keycards distributors in Dubai and UAE",
         "SALTO keycards distributors in DUBAI and UAE",
-        "SALTO key cards distributors in Dubai"
+        "SALTO key cards distributors in Dubai",
+        "SALTO keycard distributors in India"
       ],
-      "interaction_count": 102,
+      "interaction_count": 107,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -49,7 +49,7 @@
   },
   "conversation_summaries": {},
   "frequently_asked": {
-    "hello": 24,
+    "hello": 25,
     "https://alhutaib.com/": 2,
     "what is this website about": 1,
     "what software solutions does this cpmpany provide": 1,
@@ -111,8 +111,8 @@
     "do they provide pabx solutions": 1,
     "https://apachia.com\nwhat is this website about": 1,
     "explain me the pdf i have uploaded right now regarding the salto": 1,
-    "where i can find these key cards in dubai and uae": 1,
-    "get me the list of distributors dealing with this card in uae & globally": 1,
+    "where i can find these key cards in dubai and uae": 2,
+    "get me the list of distributors dealing with this card in uae & globally": 2,
     "salto keycards, including the ccvd20xx and ccvd40xx where i can find this specific card": 1,
     "i need the specific dealers": 1,
     "explain me the document i have uploaded right now": 1,
@@ -121,6 +121,8 @@
     "where i can find these cards in dubai and uae": 1,
     "salto key cards distributors in dubai and uae": 1,
     "i need the list of distributors of salto key cards in dubai and uae": 1,
-    "i need the list of distributors of salto key cards in dubai": 1
+    "i need the list of distributors of salto key cards in dubai": 1,
+    "explain me about the pdf which i have uploaded right now regarding the salto key card": 1,
+    "get me the list of distributors dealing with this card in india": 1
   }
 }
