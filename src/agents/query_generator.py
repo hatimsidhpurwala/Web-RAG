@@ -32,39 +32,58 @@ QUERY CONSTRUCTION RULES:
 5. Generate 2 queries minimum, 4 maximum.
 6. Queries must be semantically diverse — do NOT generate near-duplicates.
 
-QUERY TYPE RULES:
-  For DOCUMENT / PDF questions ("what is the pdf about", "summarize"):
-    → Generate broad queries: "product overview specifications features"
-    → Also generate specific: "[product name] details" if product is known
-    → Also add: "technical specs models available"
+QUERY TYPE — you MUST use exactly one of these values:
+  "factual"     → general fact-based questions
+  "comparative" → comparing two things
+  "explanatory" → how/why questions
+  "procedural"  → step-by-step / how-to questions
+  "commercial"  → buy / price / where-to-buy / dealer / distributor / shop
+  "contact"     → contact details / location / address / office / phone
+  "document"    → questions about an uploaded PDF or file
 
-  For CONTACT / LOCATION questions ("contact in India", "where to buy"):
-    → Generate: "[company] India contact address"
-    → Also: "[company] distributor dealer [country]"
-    → Also: "[company] office [city]"
+QUERY GENERATION RULES BY TYPE:
+  For "commercial" (buy, dealer, distributor, where to find, supplier, shop):
+    - "[product model] buy online shop"
+    - "[product] authorized distributor [location]"
+    - "[product] reseller supplier dealer"
+    - "[brand] official distributor [country]"
 
-  For TECHNICAL / SPEC questions ("chip used", "dimensions", "security"):
-    → Generate: "[product] [spec term]"
-    → Also: "[product] technical specifications"
+  For "contact" (contact info, address, office, phone, email):
+    - "[company] [country/city] contact address"
+    - "[company] distributor [location] email"
+    - "[company] [country] office phone"
+    - "[company] partner finder [region]"
 
-  For GENERAL questions:
-    → Generate the most specific, targeted queries possible.
+  For "document" (what is the pdf, summarize, explain the file):
+    - "product overview main features"
+    - "document summary specifications"
+    - "[product name] details"
+
+  For all other types:
+    - Generate the most specific, targeted queries possible.
 
 DO NOT:
   - Generate questions (no "what is...?")
   - Generate full sentences
   - Repeat the same query twice
-  - Include the word "information" alone as a query
-  - Use vague single-word queries like "document" or "info"
+  - Use a query_type value not in the list above
+  - Use "information" alone as a query
 
 EXAMPLES:
   User: "what is the salto keycard chip?"
+  query_type: "factual"
   Queries: ["SALTO keycard chip type", "MIFARE DESFire specifications", "SALTO CCVD chip security"]
 
   User: "contact details in india"
+  query_type: "contact"
   Queries: ["SALTO India contact address", "SALTO distributor India", "SALTO Systems India office email"]
 
+  User: "where can i buy SALTO keycards in UAE"
+  query_type: "commercial"
+  Queries: ["SALTO keycard buy UAE distributor", "SALTO CCVD20xx UAE reseller", "SALTO Systems UAE authorized dealer"]
+
   User: "what is the pdf about"
+  query_type: "document"
   Queries: ["product overview main features", "document summary specifications", "company services solutions"]
 """
 

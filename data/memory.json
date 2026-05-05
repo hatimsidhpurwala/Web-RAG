@@ -4,12 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "SALTO keycards PDF",
-        "SALTO keycards",
-        "SALTO keycards in UAE, Dubai",
-        "SALTO keycards contact details",
-        "SALTO keycards in India",
-        "the PDF",
         "what is this pdf about",
         "hatim.jk pdf",
         "the uploaded PDF",
@@ -23,9 +17,15 @@
         "Apachia.com",
         "SALTO PDF explanation",
         "SALTO Keycards, specifically CCVD20xx and CCVD40xx models",
-        "SALTO Keycards dealers"
+        "SALTO Keycards dealers",
+        "the uploaded document",
+        "SALTO document",
+        "SALTO keycard PDF",
+        "SALTO keycards",
+        "SALTO keycards distributors in Dubai and UAE",
+        "SALTO keycards distributors in DUBAI and UAE"
       ],
-      "interaction_count": 90,
+      "interaction_count": 100,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -49,7 +49,7 @@
   },
   "conversation_summaries": {},
   "frequently_asked": {
-    "hello": 19,
+    "hello": 23,
     "https://alhutaib.com/": 2,
     "what is this website about": 1,
     "what software solutions does this cpmpany provide": 1,
@@ -114,6 +114,12 @@
     "where i can find these key cards in dubai and uae": 1,
     "get me the list of distributors dealing with this card in uae & globally": 1,
     "salto keycards, including the ccvd20xx and ccvd40xx where i can find this specific card": 1,
-    "i need the specific dealers": 1
+    "i need the specific dealers": 1,
+    "explain me the document i have uploaded right now": 1,
+    "what is the pdf i have uploaded right now for salto": 1,
+    "what is this pdf about which i have uploaded right now regarding the salto keycard": 1,
+    "where i can find these cards in dubai and uae": 1,
+    "salto key cards distributors in dubai and uae": 1,
+    "i need the list of distributors of salto key cards in dubai and uae": 1
   }
 }

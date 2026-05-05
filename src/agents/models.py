@@ -41,14 +41,21 @@ class QueryGeneration(BaseModel):
     """Optimised search queries generated from the user's question."""
 
     queries: List[str] = Field(
-        ..., min_length=1, max_length=3, description="1-3 optimised search queries"
+        ..., min_length=1, max_length=4,
+        description="2-4 optimised search queries"
     )
     primary_entities: List[str] = Field(
         ..., description="Key entities extracted from the question"
     )
-    query_type: Literal["factual", "comparative", "explanatory", "procedural"] = Field(
-        ..., description="The type of query"
-    )
+    query_type: Literal[
+        "factual",
+        "comparative",
+        "explanatory",
+        "procedural",
+        "commercial",    # buy / price / where-to-buy / dealer
+        "contact",       # contact details / location / address
+        "document",      # questions about an uploaded file
+    ] = Field(..., description="The type of query")
 
 
 # ---------------------------------------------------------------------------
