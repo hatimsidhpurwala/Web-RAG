@@ -137,6 +137,37 @@ class RAGAgent:
         enhanced_question = conv_state.get("enhanced_query", working_question)
         strategy = analyze_query(enhanced_question, conversation_history)
 
+        # ── 2b. Short follow-up enrichment ──────────────────────────────
+        # When user sends a vague 1-3 word continuation like "explain me",
+        # "continue", "tell me more" while active docs exist, auto-expand
+        # the question using the last user turn to prevent the intent
+        # classifier from treating it as a direct/greeting response.
+        _SHORT_FOLLOWUPS = {
+            "explain me", "explain", "continue", "go on", "tell me more",
+            "more details", "elaborate", "summarize", "summary", "details",
+            "ok", "okay", "yes", "yeah", "sure", "and", "what else",
+            "more", "next", "show me", "give me more", "expand",
+        }
+        q_stripped = enhanced_question.strip().lower().rstrip(".")
+        is_short_followup = q_stripped in _SHORT_FOLLOWUPS or (
+            len(enhanced_question.split()) <= 3 and
+            not any(c.isdigit() for c in enhanced_question)
+        )
+
+        if is_short_followup and active_doc_sites and conversation_history:
+            # Find the last user question from history
+            last_user_q = ""
+            for msg in reversed(conversation_history):
+                if msg.get("role") == "user":
+                    last_user_q = msg.get("content", "")
+                    break
+            if last_user_q:
+                enhanced_question = f"{last_user_q} — please provide a detailed explanation"
+                logger.info(
+                    "Short follow-up '%s' expanded to: '%s'",
+                    working_question, enhanced_question
+                )
+
         # ── 3. Detect document questions → restrict retrieval to pdf_ ───
         _doc_keywords = (
             "pdf", "document", "uploaded", "file", "datasheet",

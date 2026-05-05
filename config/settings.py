@@ -33,7 +33,9 @@ TWILIO_WHATSAPP_NUMBER: str = os.getenv("TWILIO_WHATSAPP_NUMBER", "")
 # ---------------------------------------------------------------------------
 # LLM Configuration (Groq)
 # ---------------------------------------------------------------------------
-LLM_MODEL: str = "llama-3.1-8b-instant"
+# llama3-70b-8192 → same 70B quality as versatile, SEPARATE daily quota bucket
+# Use this when llama-3.3-70b-versatile hits the 100K TPD limit.
+LLM_MODEL: str = "llama3-70b-8192"
 LLM_TEMPERATURE: float = 0.1
 LLM_MAX_TOKENS: int = 2000
 
