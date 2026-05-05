@@ -33,9 +33,18 @@ TWILIO_WHATSAPP_NUMBER: str = os.getenv("TWILIO_WHATSAPP_NUMBER", "")
 # ---------------------------------------------------------------------------
 # LLM Configuration (Groq)
 # ---------------------------------------------------------------------------
-# llama3-70b-8192 → same 70B quality as versatile, SEPARATE daily quota bucket
-# Use this when llama-3.3-70b-versatile hits the 100K TPD limit.
-LLM_MODEL: str = "llama3-70b-8192"
+# Primary model — best quality, 100K tokens/day on free tier.
+# The system will automatically fall back if this hits its rate limit.
+LLM_MODEL: str = "llama-3.3-70b-versatile"
+
+# Ordered list of fallback models tried if LLM_MODEL is rate-limited or decommissioned.
+# Each has its own separate daily quota bucket.
+MODEL_FALLBACK_CHAIN: list = [
+    "llama-3.3-70b-versatile",          # Primary: 70B, best quality
+    "qwen/qwen3-32b",                    # Fallback 1: 32B Qwen3 (preview)
+    "meta-llama/llama-4-scout-17b-16e-instruct",  # Fallback 2: Llama 4 Scout
+    "llama-3.1-8b-instant",             # Last resort: 8B, minimal quality
+]
 LLM_TEMPERATURE: float = 0.1
 LLM_MAX_TOKENS: int = 2000
 

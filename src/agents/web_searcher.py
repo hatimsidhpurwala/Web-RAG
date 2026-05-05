@@ -18,7 +18,6 @@ from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 from duckduckgo_search import DDGS
-from groq import Groq
 
 from config.settings import (
     DEEP_RESEARCH_NUM_QUERIES,
@@ -30,6 +29,7 @@ from config.settings import (
 from src.core.chunker import chunk_markdown
 from src.core.cleaner import deduplicate_chunks, normalize_text
 from src.core.embedder import embed_chunks
+from src.core.groq_client import groq_chat
 from src.core.scraper import scrape_website
 from src.database.vector_store import VectorStore
 
@@ -194,39 +194,31 @@ def search_and_scrape(
 # Deep research
 # ======================================================================
 
+_RESEARCH_QUERY_PROMPT = (
+    "You are a web-search query expert for a RAG system. "
+    "Generate exactly {n} distinct search queries to find the best web pages "
+    "for the given topic.\n\n"
+    "RULES:\n"
+    "1. Each query must be 4-8 words, no full sentences.\n"
+    "2. Queries must be semantically diverse — no near-duplicates.\n"
+    "3. Include product model numbers if mentioned (e.g. CCVD20xx, CCVD40xx).\n"
+    "4. For COMMERCIAL queries (buy, dealer, distributor, where to find, "
+    "supplier, reseller, price, shop, stock):\n"
+    "   - Query 1: '[product model] buy online shop'\n"
+    "   - Query 2: '[product] authorized distributor [location]'\n"
+    "   - Query 3: '[product] reseller supplier dealer'\n"
+    "   - Query 4: '[brand] official distributor [country]'\n"
+    "   - Query 5: '[product model] price stock'\n"
+    "5. For INFORMATIONAL queries: generate broad research queries.\n"
+    'Return JSON: {"queries": ["q1", "q2", ...]}'
+)
+
 def _generate_research_queries(topic: str) -> List[str]:
-    """Use the LLM to produce multiple targeted search queries for *topic*.
-
-    Detects commercial intent (buy, dealer, distributor, where to find,
-    supplier, reseller, shop) and generates queries with product model
-    numbers and location terms for more specific results.
-    """
-    client = Groq(api_key=GROQ_API_KEY)
-
-    system_prompt = (
-        "You are a web-search query expert for a RAG system. "
-        "Generate exactly {n} distinct search queries to find the best web pages "
-        "for the given topic.\n\n"
-        "RULES:\n"
-        "1. Each query must be 4-8 words, no full sentences.\n"
-        "2. Queries must be semantically diverse — no near-duplicates.\n"
-        "3. Include product model numbers if mentioned (e.g. CCVD20xx, CCVD40xx).\n"
-        "4. For COMMERCIAL queries (buy, dealer, distributor, where to find, "
-        "supplier, reseller, price, shop, stock):\n"
-        "   - Query 1: '[product model] buy online shop'\n"
-        "   - Query 2: '[product] authorized distributor [location]'\n"
-        "   - Query 3: '[product] reseller supplier dealer'\n"
-        "   - Query 4: '[brand] official distributor [country]'\n"
-        "   - Query 5: '[product model] price stock'\n"
-        "5. For INFORMATIONAL queries: generate broad research queries.\n"
-        "Return JSON: {\"queries\": [\"q1\", \"q2\", ...]}"
-    ).format(n=DEEP_RESEARCH_NUM_QUERIES)
-
-    resp = client.chat.completions.create(
-        model=LLM_MODEL,
+    """Use the LLM to produce multiple targeted search queries for *topic*."""
+    resp = groq_chat(
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": topic},
+            {"role": "system", "content": _RESEARCH_QUERY_PROMPT.format(n=DEEP_RESEARCH_NUM_QUERIES)},
+            {"role": "user",   "content": topic},
         ],
         temperature=0.2,
         max_tokens=300,

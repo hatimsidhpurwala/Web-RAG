@@ -1179,43 +1179,20 @@
       "web_search_used": false,
       "sources_count": 4,
       "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-06T02:26:26.570802",
+      "query": "hello",
+      "answer_length": 347,
+      "confidence": 0.0,
+      "response_time_ms": 37354,
+      "web_search_used": true,
+      "sources_count": 0,
+      "user_feedback": ""
     }
   ],
   "improvements_applied": [],
   "performance_history": [
-    {
-      "timestamp": "2026-05-05T13:41:09.029731",
-      "summary": {
-        "total_interactions": 82,
-        "avg_confidence": 0.768,
-        "avg_response_time_ms": 13080,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.085,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:41:24.392491",
-      "summary": {
-        "total_interactions": 83,
-        "avg_confidence": 0.769,
-        "avg_response_time_ms": 13049,
-        "web_search_rate": 0.337,
-        "failure_rate": 0.084,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:54:50.169411",
-      "summary": {
-        "total_interactions": 83,
-        "avg_confidence": 0.769,
-        "avg_response_time_ms": 13049,
-        "web_search_rate": 0.337,
-        "failure_rate": 0.084,
-        "negative_feedback_count": 0
-      }
-    },
     {
       "timestamp": "2026-05-05T13:55:08.693823",
       "summary": {
@@ -2170,6 +2147,39 @@
         "avg_response_time_ms": 13797,
         "web_search_rate": 0.347,
         "failure_rate": 0.093,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-06T02:25:09.490109",
+      "summary": {
+        "total_interactions": 118,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13797,
+        "web_search_rate": 0.347,
+        "failure_rate": 0.093,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-06T02:25:49.196932",
+      "summary": {
+        "total_interactions": 118,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13797,
+        "web_search_rate": 0.347,
+        "failure_rate": 0.093,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-06T02:26:27.508864",
+      "summary": {
+        "total_interactions": 119,
+        "avg_confidence": 0.746,
+        "avg_response_time_ms": 13995,
+        "web_search_rate": 0.353,
+        "failure_rate": 0.101,
         "negative_feedback_count": 0
       }
     }

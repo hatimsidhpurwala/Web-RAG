@@ -9,9 +9,8 @@ import json
 import logging
 from typing import List, Optional
 
-from groq import Groq
-
 from config.settings import GROQ_API_KEY, LLM_MODEL
+from src.core.groq_client import groq_chat
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +44,6 @@ def direct_response(
     conversation_history: Optional[List[dict]] = None,
 ) -> str:
     """Generate a direct (non-retrieval) response for *question*."""
-    client = Groq(api_key=GROQ_API_KEY)
-
     messages: list[dict] = [{"role": "system", "content": _SYSTEM_PROMPT}]
     if conversation_history:
         for msg in conversation_history[-6:]:
@@ -60,8 +57,7 @@ def direct_response(
     )
 
     try:
-        resp = client.chat.completions.create(
-            model=LLM_MODEL,
+        resp = groq_chat(
             messages=messages,
             temperature=0.5,
             max_tokens=300,
