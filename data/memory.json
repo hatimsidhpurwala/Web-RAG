@@ -4,7 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "what is this pdf about",
         "hatim.jk pdf",
         "the uploaded PDF",
         "research_paper PDF",
@@ -23,9 +22,10 @@
         "SALTO keycard PDF",
         "SALTO keycards",
         "SALTO keycards distributors in Dubai and UAE",
-        "SALTO keycards distributors in DUBAI and UAE"
+        "SALTO keycards distributors in DUBAI and UAE",
+        "SALTO key cards distributors in Dubai"
       ],
-      "interaction_count": 100,
+      "interaction_count": 102,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -49,7 +49,7 @@
   },
   "conversation_summaries": {},
   "frequently_asked": {
-    "hello": 23,
+    "hello": 24,
     "https://alhutaib.com/": 2,
     "what is this website about": 1,
     "what software solutions does this cpmpany provide": 1,
@@ -120,6 +120,7 @@
     "what is this pdf about which i have uploaded right now regarding the salto keycard": 1,
     "where i can find these cards in dubai and uae": 1,
     "salto key cards distributors in dubai and uae": 1,
-    "i need the list of distributors of salto key cards in dubai and uae": 1
+    "i need the list of distributors of salto key cards in dubai and uae": 1,
+    "i need the list of distributors of salto key cards in dubai": 1
   }
 }

@@ -989,65 +989,30 @@
       "web_search_used": true,
       "sources_count": 1,
       "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T15:57:19.283630",
+      "query": "hello ",
+      "answer_length": 59,
+      "confidence": 1.0,
+      "response_time_ms": 3196,
+      "web_search_used": false,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T16:01:21.671499",
+      "query": "i need the list of distributors of SALTO key cards in dubai ",
+      "answer_length": 423,
+      "confidence": 0.6,
+      "response_time_ms": 58234,
+      "web_search_used": true,
+      "sources_count": 2,
+      "user_feedback": ""
     }
   ],
   "improvements_applied": [],
   "performance_history": [
-    {
-      "timestamp": "2026-05-04T15:47:35.109028",
-      "summary": {
-        "total_interactions": 63,
-        "avg_confidence": 0.755,
-        "avg_response_time_ms": 13447,
-        "web_search_rate": 0.349,
-        "failure_rate": 0.095,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-04T15:47:53.281826",
-      "summary": {
-        "total_interactions": 64,
-        "avg_confidence": 0.755,
-        "avg_response_time_ms": 13485,
-        "web_search_rate": 0.344,
-        "failure_rate": 0.094,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-04T15:48:15.307107",
-      "summary": {
-        "total_interactions": 64,
-        "avg_confidence": 0.755,
-        "avg_response_time_ms": 13485,
-        "web_search_rate": 0.344,
-        "failure_rate": 0.094,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-04T15:48:22.212475",
-      "summary": {
-        "total_interactions": 64,
-        "avg_confidence": 0.755,
-        "avg_response_time_ms": 13485,
-        "web_search_rate": 0.344,
-        "failure_rate": 0.094,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-04T15:48:35.320075",
-      "summary": {
-        "total_interactions": 64,
-        "avg_confidence": 0.755,
-        "avg_response_time_ms": 13485,
-        "web_search_rate": 0.344,
-        "failure_rate": 0.094,
-        "negative_feedback_count": 0
-      }
-    },
     {
       "timestamp": "2026-05-04T15:48:46.351521",
       "summary": {
@@ -1980,6 +1945,61 @@
         "avg_response_time_ms": 12761,
         "web_search_rate": 0.354,
         "failure_rate": 0.091,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T15:56:43.831675",
+      "summary": {
+        "total_interactions": 99,
+        "avg_confidence": 0.748,
+        "avg_response_time_ms": 12761,
+        "web_search_rate": 0.354,
+        "failure_rate": 0.091,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T15:57:16.055503",
+      "summary": {
+        "total_interactions": 99,
+        "avg_confidence": 0.748,
+        "avg_response_time_ms": 12761,
+        "web_search_rate": 0.354,
+        "failure_rate": 0.091,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T15:57:20.110999",
+      "summary": {
+        "total_interactions": 100,
+        "avg_confidence": 0.751,
+        "avg_response_time_ms": 12665,
+        "web_search_rate": 0.35,
+        "failure_rate": 0.09,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T16:00:23.371909",
+      "summary": {
+        "total_interactions": 100,
+        "avg_confidence": 0.751,
+        "avg_response_time_ms": 12665,
+        "web_search_rate": 0.35,
+        "failure_rate": 0.09,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T16:01:22.686613",
+      "summary": {
+        "total_interactions": 101,
+        "avg_confidence": 0.75,
+        "avg_response_time_ms": 13116,
+        "web_search_rate": 0.356,
+        "failure_rate": 0.089,
         "negative_feedback_count": 0
       }
     }

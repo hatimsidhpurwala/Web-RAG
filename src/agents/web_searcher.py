@@ -37,33 +37,70 @@ logger = logging.getLogger(__name__)
 
 
 # ======================================================================
-# Basic search
+# Basic search — dual provider with automatic failover
 # ======================================================================
+
+def _search_duckduckgo(query: str, max_results: int) -> List[dict]:
+    """Try DuckDuckGo first (fast, no API key needed).
+    Automatically falls back across different backends if rate-limited.
+    """
+    backends = ["api", "lite", "html"]
+    
+    for backend in backends:
+        try:
+            with DDGS() as ddgs:
+                raw = list(ddgs.text(query, max_results=max_results, backend=backend))
+            if raw:
+                logger.info("DuckDuckGo (%s) returned %d results for '%s'", backend, len(raw), query)
+                return [
+                    {
+                        "title":   r.get("title", ""),
+                        "url":     r.get("href", r.get("link", "")),
+                        "snippet": r.get("body", ""),
+                    }
+                    for r in raw
+                ]
+        except Exception as exc:
+            logger.warning("DuckDuckGo (%s) failed: %s", backend, exc)
+            
+    return []
+
+
+def _search_google(query: str, max_results: int) -> List[dict]:
+    """Fallback to Google via googlesearch-python."""
+    try:
+        from googlesearch import search as gsearch
+        results: list[dict] = []
+        for r in gsearch(query, num_results=max_results, advanced=True,
+                         sleep_interval=2):
+            results.append({
+                "title":   getattr(r, "title", "") or "",
+                "url":     getattr(r, "url", "") or "",
+                "snippet": getattr(r, "description", "") or "",
+            })
+        logger.info("Google returned %d results for '%s'", len(results), query)
+        return results
+    except Exception as exc:
+        logger.error("Google search also failed: %s", exc)
+        return []
+
 
 def search(
     query: str,
     max_results: int = WEB_SEARCH_MAX_RESULTS,
 ) -> List[dict]:
-    """Search DuckDuckGo and return a list of result dicts.
+    """Search the web and return a list of {title, url, snippet} dicts.
 
-    Each dict has keys: ``title``, ``url``, ``snippet``.
+    Uses DuckDuckGo as primary provider.  If DDG returns 0 results
+    (usually due to rate-limiting), falls back to Google automatically.
     """
-    raw: list = []          # ← always defined; avoids UnboundLocalError
-    try:
-        with DDGS() as ddgs:
-            raw = list(ddgs.text(query, max_results=max_results))
-        logger.info("DuckDuckGo returned %d results for '%s'", len(raw), query)
-    except Exception as exc:
-        logger.error("DuckDuckGo search failed: %s", exc)
-
-    return [
-        {
-            "title":   r.get("title", ""),
-            "url":     r.get("href", r.get("link", "")),
-            "snippet": r.get("body", ""),
-        }
-        for r in raw
-    ]
+    results = _search_duckduckgo(query, max_results)
+    if not results:
+        logger.info("DDG returned 0 results — falling back to Google")
+        results = _search_google(query, max_results)
+    if not results:
+        logger.warning("Both search providers returned 0 results for '%s'", query)
+    return results
 
 
 # ======================================================================
