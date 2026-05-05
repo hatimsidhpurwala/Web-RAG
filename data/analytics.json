@@ -1059,241 +1059,90 @@
       "web_search_used": true,
       "sources_count": 3,
       "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T18:40:42.566206",
+      "query": "hello ",
+      "answer_length": 59,
+      "confidence": 1.0,
+      "response_time_ms": 3294,
+      "web_search_used": false,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T18:43:33.830921",
+      "query": "explain me about the pdf i have uploaded right now regarding the SALTO key cards ",
+      "answer_length": 491,
+      "confidence": 0.0,
+      "response_time_ms": 8135,
+      "web_search_used": false,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T18:52:50.439584",
+      "query": "hello ",
+      "answer_length": 59,
+      "confidence": 1.0,
+      "response_time_ms": 3168,
+      "web_search_used": false,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T18:55:35.239784",
+      "query": "hello",
+      "answer_length": 57,
+      "confidence": 1.0,
+      "response_time_ms": 3316,
+      "web_search_used": false,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T19:00:16.038264",
+      "query": "hello ",
+      "answer_length": 59,
+      "confidence": 1.0,
+      "response_time_ms": 3634,
+      "web_search_used": false,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T19:00:49.730787",
+      "query": "what is SALTO key cards",
+      "answer_length": 258,
+      "confidence": 0.85,
+      "response_time_ms": 18242,
+      "web_search_used": false,
+      "sources_count": 2,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-05T19:12:52.823825",
+      "query": "get me the list of distributors dealing with this card in UAE & globally",
+      "answer_length": 458,
+      "confidence": 0.0,
+      "response_time_ms": 69523,
+      "web_search_used": true,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-06T01:38:13.352816",
+      "query": "get me the list of distributors dealing with this card in UAE & globally\n\n",
+      "answer_length": 500,
+      "confidence": 0.7,
+      "response_time_ms": 40049,
+      "web_search_used": true,
+      "sources_count": 2,
+      "user_feedback": ""
     }
   ],
   "improvements_applied": [],
   "performance_history": [
-    {
-      "timestamp": "2026-05-04T16:40:38.177233",
-      "summary": {
-        "total_interactions": 70,
-        "avg_confidence": 0.754,
-        "avg_response_time_ms": 13907,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.1,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-04T16:49:47.545313",
-      "summary": {
-        "total_interactions": 70,
-        "avg_confidence": 0.754,
-        "avg_response_time_ms": 13907,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.1,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-04T20:03:14.007932",
-      "summary": {
-        "total_interactions": 70,
-        "avg_confidence": 0.754,
-        "avg_response_time_ms": 13907,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.1,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T04:07:53.303842",
-      "summary": {
-        "total_interactions": 70,
-        "avg_confidence": 0.754,
-        "avg_response_time_ms": 13907,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.1,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T04:08:00.648313",
-      "summary": {
-        "total_interactions": 71,
-        "avg_confidence": 0.757,
-        "avg_response_time_ms": 13774,
-        "web_search_rate": 0.324,
-        "failure_rate": 0.099,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T12:38:16.920377",
-      "summary": {
-        "total_interactions": 71,
-        "avg_confidence": 0.757,
-        "avg_response_time_ms": 13774,
-        "web_search_rate": 0.324,
-        "failure_rate": 0.099,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:05:08.285940",
-      "summary": {
-        "total_interactions": 71,
-        "avg_confidence": 0.757,
-        "avg_response_time_ms": 13774,
-        "web_search_rate": 0.324,
-        "failure_rate": 0.099,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:05:11.585386",
-      "summary": {
-        "total_interactions": 72,
-        "avg_confidence": 0.76,
-        "avg_response_time_ms": 13617,
-        "web_search_rate": 0.319,
-        "failure_rate": 0.097,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:05:47.621941",
-      "summary": {
-        "total_interactions": 72,
-        "avg_confidence": 0.76,
-        "avg_response_time_ms": 13617,
-        "web_search_rate": 0.319,
-        "failure_rate": 0.097,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:06:56.537464",
-      "summary": {
-        "total_interactions": 72,
-        "avg_confidence": 0.76,
-        "avg_response_time_ms": 13617,
-        "web_search_rate": 0.319,
-        "failure_rate": 0.097,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:07:07.718580",
-      "summary": {
-        "total_interactions": 73,
-        "avg_confidence": 0.762,
-        "avg_response_time_ms": 13542,
-        "web_search_rate": 0.315,
-        "failure_rate": 0.096,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:07:54.730240",
-      "summary": {
-        "total_interactions": 73,
-        "avg_confidence": 0.762,
-        "avg_response_time_ms": 13542,
-        "web_search_rate": 0.315,
-        "failure_rate": 0.096,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:08:05.223903",
-      "summary": {
-        "total_interactions": 74,
-        "avg_confidence": 0.763,
-        "avg_response_time_ms": 13463,
-        "web_search_rate": 0.311,
-        "failure_rate": 0.095,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:08:29.214612",
-      "summary": {
-        "total_interactions": 74,
-        "avg_confidence": 0.763,
-        "avg_response_time_ms": 13463,
-        "web_search_rate": 0.311,
-        "failure_rate": 0.095,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:08:39.467830",
-      "summary": {
-        "total_interactions": 75,
-        "avg_confidence": 0.761,
-        "avg_response_time_ms": 13392,
-        "web_search_rate": 0.32,
-        "failure_rate": 0.093,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:09:29.456690",
-      "summary": {
-        "total_interactions": 75,
-        "avg_confidence": 0.761,
-        "avg_response_time_ms": 13392,
-        "web_search_rate": 0.32,
-        "failure_rate": 0.093,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:09:39.574526",
-      "summary": {
-        "total_interactions": 76,
-        "avg_confidence": 0.762,
-        "avg_response_time_ms": 13311,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.092,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:10:50.958062",
-      "summary": {
-        "total_interactions": 76,
-        "avg_confidence": 0.762,
-        "avg_response_time_ms": 13311,
-        "web_search_rate": 0.329,
-        "failure_rate": 0.092,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:11:12.818752",
-      "summary": {
-        "total_interactions": 77,
-        "avg_confidence": 0.763,
-        "avg_response_time_ms": 13263,
-        "web_search_rate": 0.325,
-        "failure_rate": 0.091,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:11:49.123576",
-      "summary": {
-        "total_interactions": 77,
-        "avg_confidence": 0.763,
-        "avg_response_time_ms": 13263,
-        "web_search_rate": 0.325,
-        "failure_rate": 0.091,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-05T13:12:00.239828",
-      "summary": {
-        "total_interactions": 78,
-        "avg_confidence": 0.764,
-        "avg_response_time_ms": 13200,
-        "web_search_rate": 0.321,
-        "failure_rate": 0.09,
-        "negative_feedback_count": 0
-      }
-    },
     {
       "timestamp": "2026-05-05T13:12:34.614211",
       "summary": {
@@ -2050,6 +1899,237 @@
         "avg_response_time_ms": 13535,
         "web_search_rate": 0.368,
         "failure_rate": 0.085,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:32:35.166729",
+      "summary": {
+        "total_interactions": 106,
+        "avg_confidence": 0.75,
+        "avg_response_time_ms": 13535,
+        "web_search_rate": 0.368,
+        "failure_rate": 0.085,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:40:39.238523",
+      "summary": {
+        "total_interactions": 106,
+        "avg_confidence": 0.75,
+        "avg_response_time_ms": 13535,
+        "web_search_rate": 0.368,
+        "failure_rate": 0.085,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:40:43.338885",
+      "summary": {
+        "total_interactions": 107,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13440,
+        "web_search_rate": 0.364,
+        "failure_rate": 0.084,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:42:44.348366",
+      "summary": {
+        "total_interactions": 107,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13440,
+        "web_search_rate": 0.364,
+        "failure_rate": 0.084,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:43:25.653448",
+      "summary": {
+        "total_interactions": 107,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13440,
+        "web_search_rate": 0.364,
+        "failure_rate": 0.084,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:43:35.125052",
+      "summary": {
+        "total_interactions": 108,
+        "avg_confidence": 0.746,
+        "avg_response_time_ms": 13390,
+        "web_search_rate": 0.361,
+        "failure_rate": 0.093,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:52:25.593865",
+      "summary": {
+        "total_interactions": 108,
+        "avg_confidence": 0.746,
+        "avg_response_time_ms": 13390,
+        "web_search_rate": 0.361,
+        "failure_rate": 0.093,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:52:47.239956",
+      "summary": {
+        "total_interactions": 108,
+        "avg_confidence": 0.746,
+        "avg_response_time_ms": 13390,
+        "web_search_rate": 0.361,
+        "failure_rate": 0.093,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:52:51.301780",
+      "summary": {
+        "total_interactions": 109,
+        "avg_confidence": 0.748,
+        "avg_response_time_ms": 13297,
+        "web_search_rate": 0.358,
+        "failure_rate": 0.092,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:54:47.585241",
+      "summary": {
+        "total_interactions": 109,
+        "avg_confidence": 0.748,
+        "avg_response_time_ms": 13297,
+        "web_search_rate": 0.358,
+        "failure_rate": 0.092,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:55:31.891349",
+      "summary": {
+        "total_interactions": 109,
+        "avg_confidence": 0.748,
+        "avg_response_time_ms": 13297,
+        "web_search_rate": 0.358,
+        "failure_rate": 0.092,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:55:36.161199",
+      "summary": {
+        "total_interactions": 110,
+        "avg_confidence": 0.75,
+        "avg_response_time_ms": 13206,
+        "web_search_rate": 0.355,
+        "failure_rate": 0.091,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T18:58:27.550860",
+      "summary": {
+        "total_interactions": 110,
+        "avg_confidence": 0.75,
+        "avg_response_time_ms": 13206,
+        "web_search_rate": 0.355,
+        "failure_rate": 0.091,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T19:00:12.371025",
+      "summary": {
+        "total_interactions": 110,
+        "avg_confidence": 0.75,
+        "avg_response_time_ms": 13206,
+        "web_search_rate": 0.355,
+        "failure_rate": 0.091,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T19:00:16.996319",
+      "summary": {
+        "total_interactions": 111,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13120,
+        "web_search_rate": 0.351,
+        "failure_rate": 0.09,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T19:00:31.447532",
+      "summary": {
+        "total_interactions": 111,
+        "avg_confidence": 0.753,
+        "avg_response_time_ms": 13120,
+        "web_search_rate": 0.351,
+        "failure_rate": 0.09,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T19:00:50.545826",
+      "summary": {
+        "total_interactions": 112,
+        "avg_confidence": 0.754,
+        "avg_response_time_ms": 13165,
+        "web_search_rate": 0.348,
+        "failure_rate": 0.089,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T19:11:43.241256",
+      "summary": {
+        "total_interactions": 112,
+        "avg_confidence": 0.754,
+        "avg_response_time_ms": 13165,
+        "web_search_rate": 0.348,
+        "failure_rate": 0.089,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-05T19:12:53.772541",
+      "summary": {
+        "total_interactions": 113,
+        "avg_confidence": 0.747,
+        "avg_response_time_ms": 13664,
+        "web_search_rate": 0.354,
+        "failure_rate": 0.097,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-06T01:37:33.252345",
+      "summary": {
+        "total_interactions": 113,
+        "avg_confidence": 0.747,
+        "avg_response_time_ms": 13664,
+        "web_search_rate": 0.354,
+        "failure_rate": 0.097,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-06T01:38:14.679738",
+      "summary": {
+        "total_interactions": 114,
+        "avg_confidence": 0.746,
+        "avg_response_time_ms": 13896,
+        "web_search_rate": 0.36,
+        "failure_rate": 0.096,
         "negative_feedback_count": 0
       }
     }

@@ -4,10 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "the uploaded PDF",
-        "research_paper PDF",
-        "PDF datasheet",
-        "Al Hutaib services",
         "Al Hutaib solutions",
         "hello ",
         "ALhutaib.com",
@@ -23,9 +19,13 @@
         "SALTO keycards distributors in Dubai and UAE",
         "SALTO keycards distributors in DUBAI and UAE",
         "SALTO key cards distributors in Dubai",
-        "SALTO keycard distributors in India"
+        "SALTO keycard distributors in India",
+        "SALTO key cards",
+        "hello",
+        "SALTO key cards distributors",
+        "SALTO key cards distributors in UAE and globally"
       ],
-      "interaction_count": 107,
+      "interaction_count": 115,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -49,7 +49,7 @@
   },
   "conversation_summaries": {},
   "frequently_asked": {
-    "hello": 25,
+    "hello": 29,
     "https://alhutaib.com/": 2,
     "what is this website about": 1,
     "what software solutions does this cpmpany provide": 1,
@@ -98,7 +98,7 @@
     "what is this pdf about hatim.jk": 1,
     "what is this pdf i have uploaded right now is baout": 1,
     "iam asking about the pdf research_paper": 1,
-    "what is salto key cards": 1,
+    "what is salto key cards": 2,
     "where can i find these cards in dubai and uae": 1,
     "explain me the pdf which i have uploaded right now (datasheet_)": 1,
     "im asking about the salto key cards pdf ,explain me in detail": 1,
@@ -112,7 +112,7 @@
     "https://apachia.com\nwhat is this website about": 1,
     "explain me the pdf i have uploaded right now regarding the salto": 1,
     "where i can find these key cards in dubai and uae": 2,
-    "get me the list of distributors dealing with this card in uae & globally": 2,
+    "get me the list of distributors dealing with this card in uae & globally": 4,
     "salto keycards, including the ccvd20xx and ccvd40xx where i can find this specific card": 1,
     "i need the specific dealers": 1,
     "explain me the document i have uploaded right now": 1,
@@ -123,6 +123,7 @@
     "i need the list of distributors of salto key cards in dubai and uae": 1,
     "i need the list of distributors of salto key cards in dubai": 1,
     "explain me about the pdf which i have uploaded right now regarding the salto key card": 1,
-    "get me the list of distributors dealing with this card in india": 1
+    "get me the list of distributors dealing with this card in india": 1,
+    "explain me about the pdf i have uploaded right now regarding the salto key cards": 1
   }
 }

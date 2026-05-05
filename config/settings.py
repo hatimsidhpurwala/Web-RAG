@@ -33,7 +33,7 @@ TWILIO_WHATSAPP_NUMBER: str = os.getenv("TWILIO_WHATSAPP_NUMBER", "")
 # ---------------------------------------------------------------------------
 # LLM Configuration (Groq)
 # ---------------------------------------------------------------------------
-LLM_MODEL: str = "llama-3.3-70b-versatile"
+LLM_MODEL: str = "llama-3.1-8b-instant"
 LLM_TEMPERATURE: float = 0.1
 LLM_MAX_TOKENS: int = 2000
 
