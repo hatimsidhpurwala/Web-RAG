@@ -1,6 +1,12 @@
 """
 Web searcher agent – DuckDuckGo search, scrape-and-index, and
 deep-research capabilities.
+
+Key improvement: DuckDuckGo result snippets are NEVER discarded.
+When a page blocks scraping or returns too little, the snippet
+(title + URL + description) is stored as a lightweight fallback chunk.
+This ensures dealer names, URLs, and descriptions always make it into
+the knowledge base even if the full page is inaccessible.
 """
 
 from __future__ import annotations
@@ -50,11 +56,10 @@ def search(
     except Exception as exc:
         logger.error("DuckDuckGo search failed: %s", exc)
 
-    # Safe to use raw here — it is always a list (empty on failure)
     return [
         {
-            "title": r.get("title", ""),
-            "url":   r.get("href", r.get("link", "")),
+            "title":   r.get("title", ""),
+            "url":     r.get("href", r.get("link", "")),
             "snippet": r.get("body", ""),
         }
         for r in raw
@@ -65,6 +70,9 @@ def search(
 # Search + scrape + index
 # ======================================================================
 
+_MIN_SCRAPE_CHARS = 300   # if scrape returns less than this, use snippet
+
+
 def search_and_scrape(
     query: str,
     vector_store: VectorStore,
@@ -72,27 +80,58 @@ def search_and_scrape(
 ) -> Dict:
     """Search the web, scrape top results, and index them.
 
+    **Critical behaviour:** when a page cannot be scraped (blocked, JS-only,
+    returns too little), the DuckDuckGo title + snippet is stored as a
+    lightweight fallback chunk.  This ensures dealer names, URLs, and
+    descriptions are never silently discarded.
+
     Returns
     -------
     dict
         ``sites_indexed`` (list of site labels),
-        ``total_chunks`` (int).
+        ``total_chunks``  (int),
+        ``raw_results``   (list of {title, url, snippet} dicts — always populated).
     """
     results = search(query, max_results=max_results)
     sites_indexed: list[str] = []
     total_chunks = 0
+    raw_results: list[dict] = []   # ← always returned for caller use
 
     for result in results:
         url = result.get("url", "")
         if not url:
             continue
 
-        markdown = scrape_website(url, delay=SCRAPE_DELAY_SECONDS)
-        if not markdown:
-            continue
+        title   = result.get("title", "")
+        snippet = result.get("snippet", "")
+
+        # Build the rich snippet text that we use as fallback / supplement
+        snippet_text = (
+            f"**{title}**\n"
+            f"Source: {url}\n\n"
+            f"{snippet}"
+        ).strip()
+
+        # Save raw result for the caller (response generator can use this)
+        raw_results.append({"title": title, "url": url, "snippet": snippet})
+
+        # ── Try to scrape the full page ──────────────────────────────
+        markdown: Optional[str] = None
+        try:
+            markdown = scrape_website(url, delay=SCRAPE_DELAY_SECONDS)
+        except Exception as exc:
+            logger.warning("Scrape error for %s: %s", url, exc)
+
+        if not markdown or len(markdown.strip()) < _MIN_SCRAPE_CHARS:
+            # Scraping failed or returned almost nothing — use snippet as content
+            logger.info(
+                "Using snippet fallback for %s (%d chars scraped)",
+                url, len(markdown or "")
+            )
+            markdown = snippet_text
 
         markdown = normalize_text(markdown)
-        domain = urlparse(url).netloc.replace("www.", "")
+        domain    = urlparse(url).netloc.replace("www.", "")
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         site_name = f"web_{domain}_{timestamp}"
 
@@ -104,9 +143,14 @@ def search_and_scrape(
         total_chunks += stored
         sites_indexed.append(site_name)
 
-        logger.info("Indexed %d chunks from %s", stored, url)
+        logger.info("Indexed %d chunks from %s (via %s)",
+                    stored, url, "scrape" if markdown != snippet_text else "snippet")
 
-    return {"sites_indexed": sites_indexed, "total_chunks": total_chunks}
+    return {
+        "sites_indexed": sites_indexed,
+        "total_chunks":  total_chunks,
+        "raw_results":   raw_results,     # ← NEW: raw DDG results always included
+    }
 
 
 # ======================================================================
@@ -114,23 +158,41 @@ def search_and_scrape(
 # ======================================================================
 
 def _generate_research_queries(topic: str) -> List[str]:
-    """Use the LLM to produce multiple search queries for *topic*."""
+    """Use the LLM to produce multiple targeted search queries for *topic*.
+
+    Detects commercial intent (buy, dealer, distributor, where to find,
+    supplier, reseller, shop) and generates queries with product model
+    numbers and location terms for more specific results.
+    """
     client = Groq(api_key=GROQ_API_KEY)
+
+    system_prompt = (
+        "You are a web-search query expert for a RAG system. "
+        "Generate exactly {n} distinct search queries to find the best web pages "
+        "for the given topic.\n\n"
+        "RULES:\n"
+        "1. Each query must be 4-8 words, no full sentences.\n"
+        "2. Queries must be semantically diverse — no near-duplicates.\n"
+        "3. Include product model numbers if mentioned (e.g. CCVD20xx, CCVD40xx).\n"
+        "4. For COMMERCIAL queries (buy, dealer, distributor, where to find, "
+        "supplier, reseller, price, shop, stock):\n"
+        "   - Query 1: '[product model] buy online shop'\n"
+        "   - Query 2: '[product] authorized distributor [location]'\n"
+        "   - Query 3: '[product] reseller supplier dealer'\n"
+        "   - Query 4: '[brand] official distributor [country]'\n"
+        "   - Query 5: '[product model] price stock'\n"
+        "5. For INFORMATIONAL queries: generate broad research queries.\n"
+        "Return JSON: {\"queries\": [\"q1\", \"q2\", ...]}"
+    ).format(n=DEEP_RESEARCH_NUM_QUERIES)
+
     resp = client.chat.completions.create(
         model=LLM_MODEL,
         messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Generate exactly 3 distinct web-search queries to "
-                    "comprehensively research the given topic. Return JSON: "
-                    '{"queries": ["q1", "q2", "q3"]}'
-                ),
-            },
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": topic},
         ],
-        temperature=0.3,
-        max_tokens=200,
+        temperature=0.2,
+        max_tokens=300,
         response_format={"type": "json_object"},
     )
     data = json.loads(resp.choices[0].message.content)
@@ -149,25 +211,35 @@ def deep_research(
     Returns
     -------
     dict
-        ``queries_used``, ``sites_indexed``, ``total_chunks``.
+        ``queries_used``, ``sites_indexed``, ``total_chunks``,
+        ``raw_results`` (all DDG results collected across all queries).
     """
     queries = _generate_research_queries(topic)
     all_sites: list[str] = []
+    all_raw: list[dict]  = []
     total_chunks = 0
 
     for query in queries:
         info = search_and_scrape(query, vector_store, max_results=2)
         all_sites.extend(info["sites_indexed"])
+        all_raw.extend(info.get("raw_results", []))
         total_chunks += info["total_chunks"]
 
+    # De-duplicate raw results by URL
+    seen_urls: set[str] = set()
+    deduped_raw: list[dict] = []
+    for r in all_raw:
+        if r["url"] not in seen_urls:
+            seen_urls.add(r["url"])
+            deduped_raw.append(r)
+
     logger.info(
-        "Deep research complete: %d queries, %d sites, %d chunks",
-        len(queries),
-        len(all_sites),
-        total_chunks,
+        "Deep research complete: %d queries, %d sites, %d chunks, %d raw results",
+        len(queries), len(all_sites), total_chunks, len(deduped_raw),
     )
     return {
-        "queries_used": queries,
+        "queries_used":  queries,
         "sites_indexed": all_sites,
-        "total_chunks": total_chunks,
+        "total_chunks":  total_chunks,
+        "raw_results":   deduped_raw,   # ← NEW
     }

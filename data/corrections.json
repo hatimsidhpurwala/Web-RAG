@@ -13,6 +13,13 @@
       "query": "iam asking about the pdf research_paper ",
       "wrong_answer": "**Quick answer:** The PDF appears to be a resume or a portfolio of a individual named Hatim Sidhpurwala, highlighting their education, professional experience, and skills in the field of computer science and information technology.\n\n**Details:**\nThe document includes details about their academic background, work experience, and projects they have worked on, including IT helpdesk process automation, sales and revenue forecasting, and quality assurance. The PDF also contains some research paper ex",
       "correct_answer": "iam asking about the pdf research_paper "
+    },
+    {
+      "timestamp": "2026-05-05T13:07:55.944651",
+      "user_id": "default",
+      "query": "im asking about the salto key cards pdf ,explain me in detail ",
+      "wrong_answer": "**Quick answer:** The PDF datasheet appears to be related to two different topics.\n\n**Details:**\nThe first part discusses a proposed stacked LSTM model architecture, including the layer units, activation, output shape, and parameters. It also mentions the classification output, loss function, and optimization. The second part describes the specifications of a keycard, including its dimensions, material, chip manufacturer, and chip type. It also lists the available colors, RF interface, data rete",
+      "correct_answer": "im asking about the salto key cards pdf ,explain me in detail "
     }
   ]
 }

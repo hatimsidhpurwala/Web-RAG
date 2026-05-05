@@ -4,16 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "hello ",
-        "alhutaib.com website",
-        "the PDF the user has uploaded",
-        "PDF content",
-        "what is the pdf i have uploaded right now is about ",
-        "what is this pdf about which i have uploaded right now ",
-        "SALTO pdf",
-        "SALTO Keycards pdf",
-        "hell ",
-        "SALTO PDF",
         "SALTO keycards PDF",
         "SALTO keycards",
         "SALTO keycards in UAE, Dubai",
@@ -23,9 +13,19 @@
         "what is this pdf about",
         "hatim.jk pdf",
         "the uploaded PDF",
-        "research_paper PDF"
+        "research_paper PDF",
+        "PDF datasheet",
+        "Al Hutaib services",
+        "Al Hutaib solutions",
+        "hello ",
+        "ALhutaib.com",
+        "ALhutaib.com services",
+        "Apachia.com",
+        "SALTO PDF explanation",
+        "SALTO Keycards, specifically CCVD20xx and CCVD40xx models",
+        "SALTO Keycards dealers"
       ],
-      "interaction_count": 71,
+      "interaction_count": 90,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -40,11 +40,16 @@
       "answer": "iam asking about the pdf research_paper ",
       "source": "user_correction",
       "timestamp": "2026-05-04T16:25:55.375585"
+    },
+    "im asking about the salto key cards pdf ,explain me in detail": {
+      "answer": "im asking about the salto key cards pdf ,explain me in detail ",
+      "source": "user_correction",
+      "timestamp": "2026-05-05T13:07:55.946645"
     }
   },
   "conversation_summaries": {},
   "frequently_asked": {
-    "hello": 15,
+    "hello": 19,
     "https://alhutaib.com/": 2,
     "what is this website about": 1,
     "what software solutions does this cpmpany provide": 1,
@@ -94,6 +99,21 @@
     "what is this pdf i have uploaded right now is baout": 1,
     "iam asking about the pdf research_paper": 1,
     "what is salto key cards": 1,
-    "where can i find these cards in dubai and uae": 1
+    "where can i find these cards in dubai and uae": 1,
+    "explain me the pdf which i have uploaded right now (datasheet_)": 1,
+    "im asking about the salto key cards pdf ,explain me in detail": 1,
+    "where i can find those key carsd in dubai and uae": 1,
+    "can i found these cards in india": 1,
+    "https://alhutaib.com what is this website about": 1,
+    "are they offering cctv and pabx solutions": 1,
+    "do they offer pbax solution": 1,
+    "what is alhutaib.com": 1,
+    "do they provide pabx solutions": 1,
+    "https://apachia.com\nwhat is this website about": 1,
+    "explain me the pdf i have uploaded right now regarding the salto": 1,
+    "where i can find these key cards in dubai and uae": 1,
+    "get me the list of distributors dealing with this card in uae & globally": 1,
+    "salto keycards, including the ccvd20xx and ccvd40xx where i can find this specific card": 1,
+    "i need the specific dealers": 1
   }
 }

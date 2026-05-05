@@ -170,13 +170,14 @@ def make_node_web_search(vector_store: "VectorStore"):
             info = search_and_scrape(state["question"], vector_store)
         except Exception as exc:
             logger.error("Web search failed: %s", exc)
-            info = {"sites_indexed": [], "total_chunks": 0}
+            info = {"sites_indexed": [], "total_chunks": 0, "raw_results": []}
 
         features = list(state.get("enhanced_features_used", []))
         features.append("web_search")
         return {
             "web_search_performed": True,
-            "research_info": info,
+            "research_info":        info,
+            "raw_search_results":   info.get("raw_results", []),  # ← store DDG cards
             "enhanced_features_used": features,
         }
 
@@ -208,15 +209,50 @@ def make_node_re_retrieve(vector_store: "VectorStore"):
 # ──────────────────────────────────────────────────────────────────────
 
 def node_re_generate_response(state: AgentState) -> dict:
-    """Re-generate the answer using newly retrieved (post-web-search) chunks."""
+    """Re-generate the answer using newly retrieved (post-web-search) chunks.
+
+    Injects raw DuckDuckGo search-result cards (title + URL + snippet) as
+    synthetic context chunks PREPENDED to the vector-store chunks.  This
+    ensures dealer names, URLs, and product descriptions from web search are
+    always available to the response generator, even when scraping failed.
+    """
+    chunks = list(state.get("retrieved_chunks", []))
+
+    # Build synthetic chunks from raw DDG results and prepend them
+    raw_results = state.get("raw_search_results", [])
+    if raw_results:
+        synthetic: list[dict] = []
+        for r in raw_results:
+            title   = r.get("title", "")
+            url     = r.get("url", "")
+            snippet = r.get("snippet", "")
+            if not (title or snippet):
+                continue
+            synthetic.append({
+                "text": (
+                    f"**{title}**\n"
+                    f"Website: {url}\n\n"
+                    f"{snippet}"
+                ),
+                "source_url":     url,
+                "site_name":      "web_search_result",
+                "score":          0.7,
+                "context_header": "Web Search Result",
+            })
+        # Prepend so the LLM sees the freshest web results first
+        chunks = synthetic + chunks
+        logger.info(
+            "Injected %d synthetic DDG result chunks into context", len(synthetic)
+        )
+
     result = generate_response(
         state["question"],
-        state.get("retrieved_chunks", []),
+        chunks,
         state.get("conversation_history"),
     )
     return {
-        "final_answer": result.answer,
-        "confidence": result.confidence,
-        "sources": [s.source_url for s in result.sources_used],
+        "final_answer":        result.answer,
+        "confidence":          result.confidence,
+        "sources":             [s.source_url for s in result.sources_used],
         "follow_up_suggestions": result.follow_up_suggestions or [],
     }
