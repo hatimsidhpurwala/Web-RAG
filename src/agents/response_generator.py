@@ -205,9 +205,8 @@ def _build_table_from_chunks(chunks: List[dict], llm_answer: str) -> str:
     )
 
     try:
-        client = _Groq(api_key=GROQ_API_KEY)
-        resp = client.chat.completions.create(
-            model=LLM_MODEL,
+        from src.core.groq_client import groq_chat
+        resp = groq_chat(
             messages=[{"role": "user", "content": extraction_prompt}],
             temperature=0.0,
             max_tokens=800,

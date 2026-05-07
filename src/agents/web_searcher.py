@@ -257,7 +257,7 @@ _RESEARCH_QUERY_PROMPT = (
     "   - Query 4: '[brand] official distributor [country]'\n"
     "   - Query 5: '[product model] price stock'\n"
     "5. For INFORMATIONAL queries: generate broad research queries.\n"
-    'Return JSON: {"queries": ["q1", "q2", ...]}'
+    'Return JSON: {{"queries": ["q1", "q2", ...]}}'
 )
 
 def _generate_research_queries(topic: str) -> List[str]:
