@@ -28,6 +28,7 @@ from config.settings import (
 )
 from src.core.chunker import chunk_markdown
 from src.core.cleaner import deduplicate_chunks, normalize_text
+from src.core.contact_extractor import extract_contacts_from_url
 from src.core.embedder import embed_chunks
 from src.core.groq_client import groq_chat
 from src.core.scraper import scrape_website
@@ -149,18 +150,63 @@ def search_and_scrape(
             f"{snippet}"
         ).strip()
 
-        # Save raw result for the caller (response generator can use this)
-        raw_results.append({"title": title, "url": url, "snippet": snippet})
-
-        # ── Try to scrape the full page ──────────────────────────────
+        # ── Single fetch: contact extraction + markdown conversion ───────
         markdown: Optional[str] = None
+        raw_html: Optional[str] = None
+
         try:
-            markdown = scrape_website(url, delay=SCRAPE_DELAY_SECONDS)
+            import time as _time
+            if SCRAPE_DELAY_SECONDS > 0:
+                _time.sleep(SCRAPE_DELAY_SECONDS)
+            import requests as _req
+            import html2text as _h2t
+            _resp = _req.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                timeout=15,
+                allow_redirects=True,
+            )
+            _resp.raise_for_status()
+            raw_html = _resp.text
+
+            # Convert HTML → Markdown (same logic as scrape_website)
+            from bs4 import BeautifulSoup as _BS
+            _soup = _BS(raw_html, "html.parser")
+            for _tag in _soup.find_all(
+                ["script", "style", "nav", "footer", "header", "aside", "noscript", "iframe"]
+            ):
+                _tag.decompose()
+            _conv = _h2t.HTML2Text()
+            _conv.ignore_links = False
+            _conv.ignore_images = True
+            _conv.body_width = 0
+            _conv.skip_internal_links = True
+            markdown = _conv.handle(str(_soup)).strip()
+
         except Exception as exc:
-            logger.warning("Scrape error for %s: %s", url, exc)
+            logger.warning("Fetch/parse error for %s: %s", url, exc)
+
+        # ── Extract contact details from the live HTML ────────────────────
+        contacts: dict = {"phones": [], "emails": [], "addresses": [], "whatsapp": []}
+        if raw_html:
+            try:
+                from src.core.contact_extractor import extract_contacts_from_html
+                contacts = extract_contacts_from_html(raw_html, base_url=url)
+            except Exception as exc:
+                logger.warning("Contact extraction failed for %s: %s", url, exc)
+
+        # Save raw result with contact details attached
+        raw_results.append({
+            "title":     title,
+            "url":       url,
+            "snippet":   snippet,
+            "phones":    contacts.get("phones", []),
+            "emails":    contacts.get("emails", []),
+            "addresses": contacts.get("addresses", []),
+            "whatsapp":  contacts.get("whatsapp", []),
+        })
 
         if not markdown or len(markdown.strip()) < _MIN_SCRAPE_CHARS:
-            # Scraping failed or returned almost nothing — use snippet as content
             logger.info(
                 "Using snippet fallback for %s (%d chars scraped)",
                 url, len(markdown or "")
@@ -180,8 +226,9 @@ def search_and_scrape(
         total_chunks += stored
         sites_indexed.append(site_name)
 
-        logger.info("Indexed %d chunks from %s (via %s)",
-                    stored, url, "scrape" if markdown != snippet_text else "snippet")
+        logger.info("Indexed %d chunks from %s (via %s) | phones=%d emails=%d",
+                    stored, url, "scrape" if markdown != snippet_text else "snippet",
+                    len(contacts.get("phones", [])), len(contacts.get("emails", [])))
 
     return {
         "sites_indexed": sites_indexed,

@@ -850,6 +850,90 @@ if user_input or (
         answer = agent_result.get("final_answer", "Sorry, something went wrong.")
         st.markdown(answer, unsafe_allow_html=True)
 
+        # ── Web results contact table ─────────────────────────────────────
+        # Show whenever web search was performed and results were found.
+        # Always visible for distributor/contact queries; collapsed otherwise.
+        conf_val = agent_result.get("confidence", 1.0) or 1.0
+        web_done = agent_result.get("web_search_performed", False)
+        raw_cards = (
+            agent_result.get("research_info", {}).get("raw_results", [])
+            if web_done else []
+        )
+
+        if web_done and raw_cards:
+            # Detect if this is a contact/distributor type question
+            # Requires BOTH a contact keyword AND a product/location reference
+            _contact_kws = (
+                "distributor", "dealer", "reseller", "supplier", "partner",
+                "contact details", "phone number", "email address",
+                "where to buy", "where can i find", "where can i get",
+                "who sell", "who deal", "agent", "office address",
+            )
+            _specific_kws = (
+                "salto", "card", "keycard", "rfid", "access", "lock",
+                "uae", "dubai", "india", "africa", "qatar", "saudi",
+                "distributor", "dealer", "supplier", "reseller", "vendor",
+            )
+            user_q_lower = processed_text.lower()
+            is_contact_q = (
+                any(kw in user_q_lower for kw in _contact_kws)
+                and any(kw in user_q_lower for kw in _specific_kws)
+            )
+            auto_expand  = is_contact_q or conf_val < 0.75
+
+            n_with_contacts = sum(
+                1 for c in raw_cards
+                if c.get("phones") or c.get("emails") or c.get("addresses")
+            )
+            label = (
+                f"📋 Found {len(raw_cards)} web result(s) — "
+                f"{n_with_contacts} with contact details"
+            )
+
+            with st.expander(label, expanded=auto_expand):
+                st.markdown(
+                    "<small style='color:#a5b4fc;'>Scraped live from the web. "
+                    "Blank cells (—) = not found on that page.</small>",
+                    unsafe_allow_html=True,
+                )
+                rows: list[dict] = []
+                for card in raw_cards[:10]:
+                    title   = card.get("title", "").strip()
+                    url     = card.get("url", "").strip()
+                    phones  = ", ".join(card.get("phones", []))
+                    emails  = ", ".join(card.get("emails", []))
+                    address = "; ".join(card.get("addresses", [])[:1])
+                    wapp    = ", ".join(card.get("whatsapp", []))
+                    snippet = card.get("snippet", "").strip()[:150]
+                    if not (title or url):
+                        continue
+                    name_cell = f"[{title or url}]({url})" if url else (title or "—")
+                    rows.append({
+                        "Company / Website": name_cell,
+                        "Phone":    phones  or "—",
+                        "Email":    emails  or "—",
+                        "Address":  address or "—",
+                        "WhatsApp": wapp    or "—",
+                        "Notes":    snippet or "—",
+                    })
+
+                if rows:
+                    cols = ["Company / Website", "Phone", "Email", "Address", "WhatsApp", "Notes"]
+                    hdr  = "| " + " | ".join(cols) + " |"
+                    sep  = "| " + " | ".join(["---"] * len(cols)) + " |"
+                    body = "\n".join(
+                        "| " + " | ".join(
+                            # Escape pipe characters inside cells
+                            str(r.get(c, "—")).replace("|", "\\|")
+                            for c in cols
+                        ) + " |"
+                        for r in rows
+                    )
+                    st.markdown(f"{hdr}\n{sep}\n{body}", unsafe_allow_html=False)
+                else:
+                    st.info("No structured results to display.")
+
+
         meta = {
             "confidence": agent_result.get("confidence"),
             "sources": agent_result.get("sources", []),

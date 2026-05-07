@@ -246,10 +246,11 @@ def node_re_generate_response(state: AgentState) -> dict:
     chunks = list(state.get("retrieved_chunks", []))
 
     # Build synthetic chunks from raw DDG results and prepend them
+    # Cap to 6 synthetic + 6 vector chunks so we never exceed the token budget
     raw_results = state.get("raw_search_results", [])
     if raw_results:
         synthetic: list[dict] = []
-        for r in raw_results:
+        for r in raw_results[:6]:   # max 6 DDG cards
             title   = r.get("title", "")
             url     = r.get("url", "")
             snippet = r.get("snippet", "")
@@ -259,15 +260,21 @@ def node_re_generate_response(state: AgentState) -> dict:
                 "text": (
                     f"**{title}**\n"
                     f"Website: {url}\n\n"
-                    f"{snippet}"
+                    f"{snippet[:500]}"
                 ),
                 "source_url":     url,
                 "site_name":      "web_search_result",
                 "score":          0.7,
                 "context_header": "Web Search Result",
+                # Pass through contact fields extracted during scraping
+                "phones":    r.get("phones", []),
+                "emails":    r.get("emails", []),
+                "addresses": r.get("addresses", []),
+                "whatsapp":  r.get("whatsapp", []),
             })
         # Prepend so the LLM sees the freshest web results first
-        chunks = synthetic + chunks
+        # Then keep up to 6 vector-store chunks for grounding
+        chunks = synthetic + chunks[:6]
         logger.info(
             "Injected %d synthetic DDG result chunks into context", len(synthetic)
         )

@@ -157,12 +157,13 @@ class FactVerifier:
         """Verify *claims* against *source_chunks*."""
         client = Groq(api_key=GROQ_API_KEY)
 
-        # Build evidence block
+        # Build evidence block — trim each chunk to 400 chars to avoid overflow
         evidence_parts = []
-        for i, chunk in enumerate(source_chunks[:10], 1):
+        for i, chunk in enumerate(source_chunks[:8], 1):
+            text = chunk.get("text", "")[:400]
             evidence_parts.append(
                 f"[Source {i}: {chunk.get('source_url', 'unknown')}]\n"
-                f"{chunk['text']}\n"
+                f"{text}\n"
             )
         evidence_block = "\n".join(evidence_parts) if evidence_parts else "(no sources)"
 

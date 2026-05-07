@@ -246,24 +246,43 @@ class RAGAgent:
         features_used = list(result.get("enhanced_features_used", []))
         confidence = result.get("confidence", 0.0)
 
-        # 5a. Auto deep research – SKIPPED for document questions
+        # 5a. Auto deep research – triggered only for retrieval-type queries
+        # NEVER triggered for: greetings, gratitude, farewell, clarification,
+        # or very short/vague queries (< 4 words).
+        _NON_RESEARCH_INTENTS = {"greeting", "gratitude", "farewell", "clarification"}
+        _is_pure_doc_q = is_document_q and not any(
+            kw in q_lower for kw in (
+                "distributor", "dealer", "reseller", "supplier", "partner",
+                "contact", "phone", "email", "address", "office", "where can i",
+                "where to buy", "where to find", "price", "cost",
+            )
+        )
+        _intent = result.get("intent", "retrieval_needed")
+        _q_word_count = len(question.strip().split())
         if (
-            confidence < 0.65
+            confidence < 0.90
             and not result.get("web_search_performed", False)
-            and not is_document_q
+            and not _is_pure_doc_q
+            and _intent not in _NON_RESEARCH_INTENTS
+            and _q_word_count >= 4            # skip vague 1-3 word queries
         ):
             logger.info(
-                "Confidence %.2f < 0.80 – auto deep research: %s",
-                confidence, enhanced_question[:80],
+                "Confidence %.2f < 0.90 – auto deep research (intent=%s): %s",
+                confidence, _intent, enhanced_question[:80],
             )
             try:
                 research = self._deep_research(enhanced_question, conversation_history)
-                if research.get("confidence", 0) > confidence:
+                # Always adopt web research answer if web search was run —
+                # even if confidence didn't improve, raw web data is better
+                # than a vague 'info not available' answer.
+                if research.get("web_search_performed"):
                     final_answer = research["final_answer"]
-                    confidence = research["confidence"]
+                    confidence = max(research.get("confidence", 0), confidence)
                     result["sources"] = research.get("sources", [])
                     result["web_search_performed"] = True
                     result["confidence"] = confidence
+                    # Preserve raw DDG cards so Streamlit can render them
+                    result["research_info"] = research.get("research_info", {})
                     features_used.append("auto_deep_research")
             except Exception as exc:
                 logger.error("Auto deep research failed: %s", exc)
@@ -343,11 +362,41 @@ class RAGAgent:
             info = deep_research(topic, self.vector_store)
         except Exception as exc:
             logger.error("Deep research failed: %s", exc)
-            info = {"queries_used": [], "sites_indexed": [], "total_chunks": 0}
+            info = {"queries_used": [], "sites_indexed": [], "total_chunks": 0, "raw_results": []}
+
+        # Build synthetic chunks from raw DDG result cards so the LLM
+        # always sees the actual web-found URLs / company names / snippets.
+        raw_results: list = info.get("raw_results", [])
+        synthetic_chunks: list[dict] = []
+        for r in raw_results[:6]:
+            title   = r.get("title", "")
+            url     = r.get("url", "")
+            snippet = r.get("snippet", "")
+            if not (title or snippet):
+                continue
+            synthetic_chunks.append({
+                "text": (
+                    f"**{title}**\n"
+                    f"Website: {url}\n\n"
+                    f"{snippet[:500]}"
+                ),
+                "source_url":     url,
+                "site_name":      "web_search_result",
+                "score":          0.75,
+                "context_header": "Web Search Result",
+                # Pass through scraped contact details
+                "phones":    r.get("phones", []),
+                "emails":    r.get("emails", []),
+                "addresses": r.get("addresses", []),
+                "whatsapp":  r.get("whatsapp", []),
+            })
 
         queries_obj = generate_queries(topic, conversation_history)
-        chunks = retrieve_chunks(queries_obj.queries, self.vector_store)
-        resp = generate_response(topic, chunks, conversation_history)
+        kb_chunks   = retrieve_chunks(queries_obj.queries, self.vector_store)
+
+        # Prepend synthetic web cards so LLM sees live results first
+        all_chunks = synthetic_chunks + kb_chunks[:6]
+        resp = generate_response(topic, all_chunks, conversation_history)
 
         return {
             "question": topic,
