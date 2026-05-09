@@ -56,7 +56,7 @@ class SentimentAdapter:
                 "tone_hint": "Be concise and solution-focused. Acknowledge urgency.",
             }
 
-        if any(w in lower for w in ["asap", "urgent", "immediately", "right now"]):
+        if any(w in lower for w in ["asap", "urgent", "immediately", "urgent response"]):
             return {
                 "emotion": "urgent",
                 "urgency": "high",
@@ -110,11 +110,9 @@ class SentimentAdapter:
             return prefix + answer
 
         elif urgency == "high":
-            prefix = "**Quick answer:** "
-            # Put the most important sentence first
-            sentences = answer.replace("\n", " ").split(". ")
-            if len(sentences) > 1:
-                return prefix + sentences[0] + ".\n\n**Details:**\n" + ". ".join(sentences[1:])
+            # Instead of destroying Markdown by removing newlines, 
+            # just add a priority header.
+            prefix = "⏱️ **Priority Response:**\n\n"
             return prefix + answer
 
         elif emotion == "satisfied":
