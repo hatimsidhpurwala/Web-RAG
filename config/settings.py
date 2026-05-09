@@ -57,8 +57,8 @@ EMBEDDING_DIMENSION: int = 384
 # ---------------------------------------------------------------------------
 # Document Chunking
 # ---------------------------------------------------------------------------
-CHUNK_SIZE: int = 150          # tokens per chunk (was 500 – too coarse)
-CHUNK_OVERLAP: int = 30        # overlapping tokens (was 50)
+CHUNK_SIZE: int = 800          # tokens per chunk (increased for better context)
+CHUNK_OVERLAP: int = 100       # overlapping tokens to preserve sentence continuity
 
 # ---------------------------------------------------------------------------
 # Retrieval
