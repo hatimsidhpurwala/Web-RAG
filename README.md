@@ -11,7 +11,7 @@ An intelligent AI assistant that scrapes websites, processes multiple input type
 | 🔍 **Hybrid RAG Pipeline** | LangGraph-based agent that classifies intent, retrieves from vector DB, and auto-searches the web when confidence is low |
 | 🎙️ **Voice Input** | Audio transcription via Groq Whisper |
 | 🖼️ **Image OCR** | Text extraction from images via Tesseract |
-| 📄 **PDF Processing** | Automatic text extraction and indexing |
+| 📄 **Document Profiling** | **NEW:** Smart hashing, AI-driven summaries, and deduplication of uploaded PDFs via Metadata Registry |
 | 🌐 **Web Scraping** | Auto-detects URLs, scrapes, and indexes content |
 | 🔬 **Deep Research** | `/research <topic>` command for comprehensive multi-source analysis |
 | 💬 **WhatsApp Integration** | Twilio-powered webhook for WhatsApp conversations |
@@ -22,26 +22,43 @@ An intelligent AI assistant that scrapes websites, processes multiple input type
 ## 🏗️ Architecture
 
 ```
-User Input → Intent Classifier → Decision Router
-                                       ↓
-                 ┌─────────────────────┴─────────────────────┐
-                 ↓                                           ↓
-         Direct Response                           Retrieval Pipeline
-         (greetings, etc.)                                  ↓
-                                                 Query Generator
-                                                           ↓
-                                                   Retriever (Qdrant)
-                                                           ↓
-                                                 Response Generator
-                                                           ↓
-                                                Confidence Check (<70%?)
-                                                           ↓
-                                                 ┌─────────┴─────────┐
-                                                Yes                 No
-                                                 ↓                   ↓
-                                         Web Search & Scrape    Return Answer
-                                                 ↓
-                                         Re-retrieve & Answer
+       [ USER ]
+          │
+          │ 1. Uploads PDFs
+          │ 2. Asks a Question
+          ▼
++-----------------------------------+
+|        STREAMLIT WEB UI           |
++-----------------------------------+
+          │
+          │ (When Uploading)
+          ▼
++-----------------------------------+
+|     DOCUMENT PROFILER AGENT       |
+|  - Extracts text separately       |
+|  - Asks AI to summarize each PDF  |
++-----------------------------------+
+          │                   │
+  (Saves  │                   │ (Saves Chunked
+ Profiles)│                   │  Text with Tags)
+          ▼                   ▼
++-------------------+ +-------------------+
+| METADATA REGISTRY | | QDRANT VECTOR DB  |
++-------------------+ +-------------------+
+          ▲                   ▲
+  (Checks │                   │ (Searches ONLY
+   Map)   │                   │  Target PDF)
+          │                   │
++-----------------------------------+
+|         QUERY ROUTER AGENT        |
+|  - Gets User Question             |
+|  - Consults Metadata Registry     |
+|  - Pulls context from Vector DB   |
+|  - Synthesizes Answer via AI      |
++-----------------------------------+
+          │ (Auto-triggers Web Fallback if needed)
+          ▼
+       [ USER ]
 ```
 
 ---
@@ -129,7 +146,8 @@ universal-web-scraper/
 │   │   ├── cleaner.py            # Text normalisation
 │   │   ├── chunker.py            # Document chunking
 │   │   └── embedder.py           # Embedding generation
-│   ├── database/         # Vector Database
+│   ├── database/         # Databases
+│   │   ├── metadata_registry.py  # Stores document profiles
 │   │   └── vector_store.py       # Qdrant operations
 │   ├── api/              # User Interfaces
 │   │   ├── streamlit_app.py      # ChatGPT-style UI

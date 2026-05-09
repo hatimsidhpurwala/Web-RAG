@@ -284,6 +284,9 @@ def process_input(text: str, file=None, audio_bytes=None, force_reindex: bool = 
     if file is not None:
         ext = Path(file.name).suffix.lower()
         raw = file.read()
+        
+        import hashlib
+        file_hash = hashlib.sha256(raw).hexdigest()[:16]
 
         if ext in SUPPORTED_IMAGE_EXTENSIONS:
             with st.spinner("🖼️ Running OCR…"):
@@ -293,22 +296,26 @@ def process_input(text: str, file=None, audio_bytes=None, force_reindex: bool = 
             actions.append(f"🖼️ OCR: {len(ocr_text)} chars")
 
         elif ext in SUPPORTED_PDF_EXTENSIONS:
-            with st.spinner("📄 Extracting PDF…"):
-                pdf_text = extract_pdf_text(raw)
-            site_name = f"pdf_{Path(file.name).stem}"
+            site_name = f"pdf_{file_hash}"
+            from src.database.metadata_registry import MetadataRegistry
+            registry = MetadataRegistry()
+            existing_profile = registry.get_profile(site_name)
 
-            already_exists = vs.has_site(site_name)
-            if force_reindex and already_exists:
-                with st.spinner("🔄 Re-indexing with deep chunking…"):
+            if existing_profile and not force_reindex:
+                actions.append(f"📄 Found in memory: {file.name}")
+                pdf_text = f"Document Profile: {existing_profile.get('summary', '')}"
+            else:
+                with st.spinner("📄 Extracting & Profiling PDF…"):
+                    pdf_text = extract_pdf_text(raw)
+                    from src.agents.document_profiler import profile_document
+                    profile = profile_document(pdf_text)
+                    profile["original_filename"] = file.name
+                    registry.save_profile(site_name, profile)
+                
+                with st.spinner("📦 Indexing PDF…"):
                     vs.clear_site(site_name)
                     stored = index_text_content(pdf_text, site_name, vs)
-                actions.append(f"📄 Deep re-indexed PDF → {stored} chunks")
-            elif not already_exists:
-                with st.spinner("📦 Indexing PDF…"):
-                    stored = index_text_content(pdf_text, site_name, vs)
                 actions.append(f"📄 Indexed PDF → {stored} chunks")
-            else:
-                actions.append(f"📄 PDF already indexed as '{site_name}'")
 
             processed_text = pdf_text[:500] + ("…" if len(pdf_text) > 500 else "")
             input_type = "pdf"
@@ -474,10 +481,12 @@ with st.sidebar:
     # ── Active Documents panel ──────────────────────────────────
     active_docs = st.session_state.get("active_doc_sites", [])
     if active_docs:
+        from src.database.metadata_registry import MetadataRegistry
+        registry = MetadataRegistry()
         st.markdown("**📂 Active Documents this session:**")
         for doc in active_docs:
-            # Show just the filename part (strip pdf_ prefix)
-            label = doc.replace("pdf_", "").replace("img_", "")
+            profile = registry.get_profile(doc)
+            label = profile.get("original_filename", doc) if profile else doc.replace("pdf_", "")
             st.markdown(f"&nbsp;&nbsp;📄 `{label}`", unsafe_allow_html=True)
         if st.button("🗑️ Clear active documents", use_container_width=True):
             st.session_state.active_doc_sites = []
