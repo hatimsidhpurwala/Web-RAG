@@ -117,6 +117,30 @@ def make_node_retrieve_chunks(vector_store: "VectorStore"):
             vector_store,
             **kwargs,
         )
+
+        # Inject Document Profiles from Metadata Registry if they are active
+        active_docs = state.get("active_doc_sites", [])
+        if active_docs:
+            from src.database.metadata_registry import MetadataRegistry
+            registry = MetadataRegistry()
+            profile_chunks = []
+            for doc in active_docs:
+                profile = registry.get_profile(doc)
+                if profile:
+                    summary = profile.get("summary", "")
+                    topics = ", ".join(profile.get("topics", []))
+                    filename = profile.get("original_filename", doc)
+                    profile_chunks.append({
+                        "text": f"Document Profile for '{filename}':\nSummary: {summary}\nCore Topics: {topics}",
+                        "source_url": filename,
+                        "site_name": doc,
+                        "score": 1.0,  # Max score so it's prioritized by LLM
+                        "context_header": "Active Document Summary",
+                    })
+            if profile_chunks:
+                # Prepend the summaries so the LLM always has the high-level context of all uploaded files
+                chunks = profile_chunks + chunks
+
         return {"retrieved_chunks": chunks}
 
     return node_retrieve_chunks

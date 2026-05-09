@@ -41,4 +41,5 @@ class AgentState(TypedDict, total=False):
     response_time_ms: int
     enhanced_features_used: List[str]  # audit trail of features activated
     source_prefix: str                 # e.g. "pdf_" – restricts retrieval to that source type
+    active_doc_sites: List[str]        # List of site_names for currently active documents
     raw_search_results: List[dict]     # DuckDuckGo result cards {title, url, snippet}

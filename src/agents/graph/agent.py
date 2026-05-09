@@ -186,25 +186,32 @@ class RAGAgent:
         if has_active_docs and any(p in q_lower for p in _vague_doc_phrases):
             is_document_q = True
 
-        # When multiple PDFs are active, check if the user named a specific one
-        # e.g. "the SALTO keycard pdf" → restrict to pdf_Datasheet-SALTO...
+        # When multiple PDFs are active, use Metadata Registry to find specific matches
         specific_prefix: Optional[str] = None
         if has_active_docs and len(active_doc_sites) > 1:
+            from src.database.metadata_registry import MetadataRegistry
+            registry = MetadataRegistry()
             for site in active_doc_sites:
-                # Strip "pdf_" prefix to get the filename stem
-                stem = site.replace("pdf_", "").lower()
-                # Check if any significant word (>4 chars) from the stem appears in the question
-                stem_words = [w for w in stem.replace("-", " ").replace("_", " ").split() if len(w) > 4]
-                if any(word in q_lower for word in stem_words):
-                    specific_prefix = site  # exact site match → filter to that one doc
-                    logger.info("Specific PDF referenced: %s", site)
+                profile = registry.get_profile(site)
+                if profile and "original_filename" in profile:
+                    stem = profile["original_filename"].lower()
+                    topics = " ".join(profile.get("topics", [])).lower()
+                else:
+                    stem = site.replace("pdf_", "").lower()
+                    topics = ""
+                
+                # Check significant words from filename or topics
+                stem_words = [w for w in stem.replace("-", " ").replace("_", " ").replace(".", " ").split() if len(w) > 3]
+                topic_words = [w for w in topics.split() if len(w) > 3]
+                
+                if any(word in q_lower for word in stem_words + topic_words):
+                    specific_prefix = site
+                    logger.info("Specific PDF referenced via Metadata: %s", site)
                     break
 
-        # source_prefix="pdf_" tells the retriever node to filter by that prefix
-        # specific_prefix is an exact site_name (used for single-doc questions with multiple active)
-        source_prefix: Optional[str] = (
-            "pdf_" if (is_document_q and has_active_docs) else None
-        )
+        # Use specific_prefix if matched, else fallback to searching all PDFs if general document question
+        source_prefix: Optional[str] = specific_prefix if specific_prefix else ("pdf_" if (is_document_q and has_active_docs) else None)
+        
         if source_prefix:
             logger.info(
                 "Document question detected – restricting retrieval to '%s' "
@@ -226,6 +233,8 @@ class RAGAgent:
         }
         if source_prefix:
             initial_state["source_prefix"] = source_prefix
+        if active_doc_sites:
+            initial_state["active_doc_sites"] = active_doc_sites
 
         try:
             result = self.graph.invoke(initial_state)
