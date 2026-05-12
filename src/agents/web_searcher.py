@@ -45,25 +45,23 @@ def _search_duckduckgo(query: str, max_results: int) -> List[dict]:
     """Try DuckDuckGo first (fast, no API key needed).
     Automatically falls back across different backends if rate-limited.
     """
-    backends = ["api", "lite", "html"]
-    
-    for backend in backends:
-        try:
-            with DDGS() as ddgs:
-                raw = list(ddgs.text(query, max_results=max_results, backend=backend))
-            if raw:
-                logger.info("DuckDuckGo (%s) returned %d results for '%s'", backend, len(raw), query)
-                return [
-                    {
-                        "title":   r.get("title", ""),
-                        "url":     r.get("href", r.get("link", "")),
-                        "snippet": r.get("body", ""),
-                    }
-                    for r in raw
-                ]
-        except Exception as exc:
-            logger.warning("DuckDuckGo (%s) failed: %s", backend, exc)
-            
+    try:
+        with DDGS() as ddgs:
+            # New library version defaults to auto backend
+            raw = list(ddgs.text(query, max_results=max_results))
+        if raw:
+            logger.info("DuckDuckGo returned %d results for '%s'", len(raw), query)
+            return [
+                {
+                    "title":   r.get("title", ""),
+                    "url":     r.get("href", r.get("link", "")),
+                    "snippet": r.get("body", ""),
+                }
+                for r in raw
+            ]
+    except Exception as exc:
+        logger.warning("DuckDuckGo failed: %s", exc)
+        
     return []
 
 

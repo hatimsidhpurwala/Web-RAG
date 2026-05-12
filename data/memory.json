@@ -4,10 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "SALTO key cards distributors in UAE and Dubai",
-        "SALTO keycard PDF explanation",
-        "SALTO keycard distributors in Dubai and UAE",
-        "SALTO keycard distributors in India",
         "explaining uploaded PDFs",
         "PDF explanations",
         "explaining uploaded PDFs (hatimsidQA, research paper, and SALTO)",
@@ -23,9 +19,13 @@
         "document summary",
         "Hatim resume PDF",
         "deep learning technology and SALTO smart card technology comparison",
-        "helllo "
+        "helllo ",
+        "hello ",
+        "greeting",
+        "hii",
+        "can you explain me what is salto key cards in detail"
       ],
-      "interaction_count": 198,
+      "interaction_count": 202,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -49,7 +49,7 @@
   },
   "conversation_summaries": {},
   "frequently_asked": {
-    "hello": 54,
+    "hello": 57,
     "https://alhutaib.com/": 2,
     "what is this website about": 1,
     "what software solutions does this cpmpany provide": 1,
@@ -143,7 +143,7 @@
     "i need the list of distributers and their contact details  in uae and globally who are dealing with ": 1,
     "explain me about the pdf i have uploaded right now regarding the salto keycards": 1,
     "i need the list of distributors and their contact details who are dealing with this card in uae and ": 3,
-    "hii": 2,
+    "hii": 3,
     "explain me the pdf which i have uploaded right now": 1,
     "explain me the pdf which i have uploaded right now regarding the datasheet for salto": 1,
     "i need the list of distributors and their contact details in africa, who are dealing with this card": 1,
@@ -170,6 +170,8 @@
     "\"according to the salto datasheet, what specific security standards (like eal5+) and chip technologi": 1,
     "please provide a clean, bulleted summary of documents (hatimsidqa, research paper and datasheet salt": 1,
     "\"explain the difference between the deep learning technology used in the research paper and the smar": 1,
-    "helllo": 1
+    "helllo": 1,
+    "can you explain me what is salto key cards": 1,
+    "can you explain me what is salto key cards in detail": 2
   }
 }
