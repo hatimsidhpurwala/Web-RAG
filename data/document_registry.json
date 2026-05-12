@@ -1,0 +1,34 @@
+{
+  "pdf_337d5f4fe45e5b5e": {
+    "summary": "This document is a resume of Hatim Sidhpurwala, detailing his education, experience, and projects in the field of computer science and engineering.",
+    "topics": [
+      "Computer Science",
+      "Machine Learning",
+      "Quality Assurance",
+      "Data Analysis",
+      "Software Development"
+    ],
+    "original_filename": "Hatim.sidQA.pdf"
+  },
+  "pdf_d023d29d94407ba6": {
+    "summary": "This document proposes a real-time sign language recognition system using deep learning, combining MediaPipe and LSTM networks to bridge the communication gap between the deaf and hearing communities.",
+    "topics": [
+      "Sign Language Recognition",
+      "Deep Learning",
+      "MediaPipe",
+      "LSTM Networks",
+      "Human-Computer Interaction",
+      "Assistive Technology"
+    ],
+    "original_filename": "research_paper.pdf"
+  },
+  "pdf_197a486b94f7bb59": {
+    "summary": "This document provides technical specifications for SALTO Keycards, including their features, security standards, and compatibility with SALTO platforms.",
+    "topics": [
+      "SALTO Keycards",
+      "Technical Specifications",
+      "RFID Technology"
+    ],
+    "original_filename": "Datasheet-SALTO Keycards -ENG-02-24 (1).pdf"
+  }
+}

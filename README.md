@@ -11,7 +11,8 @@ An intelligent AI assistant that scrapes websites, processes multiple input type
 | 🔍 **Hybrid RAG Pipeline** | LangGraph-based agent that classifies intent, retrieves from vector DB, and auto-searches the web when confidence is low |
 | 🎙️ **Voice Input** | Audio transcription via Groq Whisper |
 | 🖼️ **Image OCR** | Text extraction from images via Tesseract |
-| 📄 **Document Profiling** | **NEW:** Smart hashing, AI-driven summaries, and deduplication of uploaded PDFs via Metadata Registry |
+| 📄 **Document Profiling** | Smart hashing, AI-driven summaries, and deduplication of uploaded PDFs via Metadata Registry |
+| 🤖 **Universal Multi-Model** | **NEW:** Dynamically hot-swap between Groq, Gemini, OpenAI, and Anthropic directly from the UI without changing code |
 | 🌐 **Web Scraping** | Auto-detects URLs, scrapes, and indexes content |
 | 🔬 **Deep Research** | `/research <topic>` command for comprehensive multi-source analysis |
 | 💬 **WhatsApp Integration** | Twilio-powered webhook for WhatsApp conversations |

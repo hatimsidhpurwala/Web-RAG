@@ -1,8 +1,7 @@
 import json
 import logging
 from typing import Dict
-from groq import Groq
-from config.settings import GROQ_API_KEY, LLM_MODEL
+from config.settings import LLM_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -20,25 +19,29 @@ Return EXACTLY this JSON format:
 
 def profile_document(text: str) -> Dict:
     """Analyze text and return a profile."""
-    client = Groq(api_key=GROQ_API_KEY)
+    from src.core.llm_factory import get_llm
+    from langchain_core.messages import SystemMessage, HumanMessage
     
     # We only need the first 4000 characters to get a good sense of the document
     sample_text = text[:4000]
     
     messages = [
-        {"role": "system", "content": _PROFILER_PROMPT},
-        {"role": "user", "content": f"Document Text:\n{sample_text}"}
+        SystemMessage(content=_PROFILER_PROMPT),
+        HumanMessage(content=f"Document Text:\n{sample_text}")
     ]
     
     try:
-        resp = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=messages,
-            temperature=0.1,
-            max_tokens=300,
-            response_format={"type": "json_object"},
-        )
-        data = json.loads(resp.choices[0].message.content)
+        llm = get_llm(temperature=0.1, max_tokens=300)
+        resp = llm.invoke(messages)
+        
+        # Parse JSON, handling potential markdown code blocks
+        content = resp.content.strip()
+        if content.startswith("```json"):
+            content = content[7:-3].strip()
+        elif content.startswith("```"):
+            content = content[3:-3].strip()
+            
+        data = json.loads(content)
         return data
     except Exception as exc:
         logger.error("Failed to profile document: %s", exc)

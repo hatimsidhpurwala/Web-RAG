@@ -87,14 +87,7 @@ EXAMPLES:
   Queries: ["product overview main features", "document summary specifications", "company services solutions"]
 """
 
-# ── Structured LLM ──────────────────────────────────────────────────────────
-_llm = ChatGroq(
-    api_key=GROQ_API_KEY,
-    model=LLM_MODEL,
-    temperature=0.1,
-    max_tokens=300,
-)
-_structured_llm = _llm.with_structured_output(QueryGeneration)
+# LLM is now dynamically fetched inside the function to support UI multi-model selection.
 
 
 # ── Public function ──────────────────────────────────────────────────────────
@@ -118,6 +111,9 @@ def generate_queries(
     messages.append(HumanMessage(content=question))
 
     try:
+        from src.core.llm_factory import get_llm
+        _llm = get_llm(temperature=0.1, max_tokens=300)
+        _structured_llm = _llm.with_structured_output(QueryGeneration)
         result: QueryGeneration = _structured_llm.invoke(messages)
         # Safety: remove any empty or too-short queries
         result.queries = [q.strip() for q in result.queries if len(q.strip()) > 4]

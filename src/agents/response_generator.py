@@ -118,15 +118,7 @@ ABSOLUTE DO-NOTS
   ✗ Do not start with "Certainly!", "Of course!", "Great question!".
 """
 
-# ── Structured LLM ──────────────────────────────────────────────────────────
-# max_tokens capped at 1200 to stay well within Groq's 64K context window
-_llm = ChatGroq(
-    api_key=GROQ_API_KEY,
-    model=LLM_MODEL,
-    temperature=0.2,
-    max_tokens=1200,
-)
-_structured_llm = _llm.with_structured_output(ResponseGeneration)
+# LLM is now dynamically fetched inside the function to support UI multi-model selection.
 
 # Safety limits — prevents context overflow
 _MAX_CHUNKS      = 12    # max chunks forwarded to LLM
@@ -323,6 +315,9 @@ def generate_response(
     messages.append(HumanMessage(content=user_content))
 
     try:
+        from src.core.llm_factory import get_llm
+        _llm = get_llm(temperature=0.2, max_tokens=1200)
+        _structured_llm = _llm.with_structured_output(ResponseGeneration)
         result: ResponseGeneration = _structured_llm.invoke(messages)
         logger.info(
             "Response generated (confidence=%.2f, sources=%d)",

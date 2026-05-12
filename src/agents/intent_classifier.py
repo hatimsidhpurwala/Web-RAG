@@ -58,14 +58,7 @@ DO NOT:
   - Classify product/company questions as "general_knowledge"
 """
 
-# ── Structured LLM (built once, reused) ────────────────────────────────────
-_llm = ChatGroq(
-    api_key=GROQ_API_KEY,
-    model=LLM_MODEL,
-    temperature=0.0,   # zero temperature for deterministic classification
-    max_tokens=200,
-)
-_structured_llm = _llm.with_structured_output(IntentClassification)
+# LLM is now dynamically fetched inside the function to support UI multi-model selection.
 
 
 # ── Public function ──────────────────────────────────────────────────────────
@@ -93,6 +86,9 @@ def classify_intent(
     messages.append(HumanMessage(content=f"[current]: {question}"))
 
     try:
+        from src.core.llm_factory import get_llm
+        _llm = get_llm(temperature=0.0, max_tokens=200)
+        _structured_llm = _llm.with_structured_output(IntentClassification)
         result: IntentClassification = _structured_llm.invoke(messages)
         logger.info(
             "Intent: %s (confidence=%.2f, retrieval=%s)",
