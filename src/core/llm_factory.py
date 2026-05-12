@@ -42,7 +42,7 @@ def get_llm(temperature: float = 0.0, max_tokens: int = 2000) -> BaseChatModel:
             api_key = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
         return ChatGoogleGenerativeAI(
             google_api_key=api_key,
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             temperature=temperature,
             max_output_tokens=max_tokens,
         )
@@ -64,7 +64,7 @@ def get_llm(temperature: float = 0.0, max_tokens: int = 2000) -> BaseChatModel:
             api_key = os.getenv("ANTHROPIC_API_KEY", "")
         return ChatAnthropic(
             api_key=api_key,
-            model="claude-3-5-sonnet-20240620",
+            model="claude-3-5-sonnet-latest",
             temperature=temperature,
             max_tokens=max_tokens,
         )

@@ -2029,54 +2029,20 @@
       "web_search_used": true,
       "sources_count": 0,
       "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-12T23:32:40.488348",
+      "query": "can you explain me what is salto key cards in detail\n",
+      "answer_length": 369,
+      "confidence": 0.0,
+      "response_time_ms": 65024,
+      "web_search_used": true,
+      "sources_count": 0,
+      "user_feedback": ""
     }
   ],
   "improvements_applied": [],
   "performance_history": [
-    {
-      "timestamp": "2026-05-09T14:37:00.504339",
-      "summary": {
-        "total_interactions": 174,
-        "avg_confidence": 0.714,
-        "avg_response_time_ms": 16292,
-        "web_search_rate": 0.414,
-        "failure_rate": 0.149,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:42:23.459983",
-      "summary": {
-        "total_interactions": 174,
-        "avg_confidence": 0.714,
-        "avg_response_time_ms": 16292,
-        "web_search_rate": 0.414,
-        "failure_rate": 0.149,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:45:04.092094",
-      "summary": {
-        "total_interactions": 174,
-        "avg_confidence": 0.714,
-        "avg_response_time_ms": 16292,
-        "web_search_rate": 0.414,
-        "failure_rate": 0.149,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:45:11.093240",
-      "summary": {
-        "total_interactions": 175,
-        "avg_confidence": 0.715,
-        "avg_response_time_ms": 16218,
-        "web_search_rate": 0.411,
-        "failure_rate": 0.149,
-        "negative_feedback_count": 0
-      }
-    },
     {
       "timestamp": "2026-05-09T14:45:58.011567",
       "summary": {
@@ -3020,6 +2986,50 @@
         "avg_response_time_ms": 19388,
         "web_search_rate": 0.389,
         "failure_rate": 0.158,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:30:33.558087",
+      "summary": {
+        "total_interactions": 203,
+        "avg_confidence": 0.712,
+        "avg_response_time_ms": 19388,
+        "web_search_rate": 0.389,
+        "failure_rate": 0.158,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:31:10.860066",
+      "summary": {
+        "total_interactions": 203,
+        "avg_confidence": 0.712,
+        "avg_response_time_ms": 19388,
+        "web_search_rate": 0.389,
+        "failure_rate": 0.158,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:31:35.430051",
+      "summary": {
+        "total_interactions": 203,
+        "avg_confidence": 0.712,
+        "avg_response_time_ms": 19388,
+        "web_search_rate": 0.389,
+        "failure_rate": 0.158,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:32:42.276743",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
         "negative_feedback_count": 0
       }
     }
