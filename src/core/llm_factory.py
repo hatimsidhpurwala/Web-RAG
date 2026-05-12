@@ -19,10 +19,8 @@ def get_llm(temperature: float = 0.0, max_tokens: int = 2000) -> BaseChatModel:
     provider = "Groq"
     if "llm_provider" in st.session_state:
         provider = st.session_state.llm_provider
-
+        
     api_key = ""
-    if "llm_api_key" in st.session_state and st.session_state.llm_api_key.strip():
-        api_key = st.session_state.llm_api_key.strip()
 
     # 2. Instantiate the exact LangChain Wrapper requested
     if provider == "Groq":

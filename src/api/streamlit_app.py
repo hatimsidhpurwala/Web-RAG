@@ -459,16 +459,9 @@ with st.sidebar:
         index=0,
         help="Choose the underlying AI engine."
     )
-    api_key = st.text_input(
-        "API Key", 
-        type="password", 
-        placeholder="Paste key (or leave blank)",
-        help="Leave blank to use the system default key from .env"
-    )
     
     # Store in session state for the LLM Factory
     st.session_state.llm_provider = provider
-    st.session_state.llm_api_key = api_key
     
     st.divider()
 
