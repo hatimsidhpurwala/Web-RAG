@@ -4,7 +4,6 @@
       "answer_style": "balanced",
       "preferred_sources": [],
       "topics_of_interest": [
-        "PDF explanations",
         "explaining uploaded PDFs (hatimsidQA, research paper, and SALTO)",
         "PDFs uploaded by user (hatim.sid, research paper, SALTO data sheet)",
         "research paper and hatim.sid PDF",
@@ -23,9 +22,10 @@
         "greeting",
         "hii",
         "can you explain me what is salto key cards in detail",
-        "can you explain me what is salto key cards in detail\n"
+        "can you explain me what is salto key cards in detail\n",
+        "can you explain me what is salto key cards in detail\n\n"
       ],
-      "interaction_count": 205,
+      "interaction_count": 207,
       "created_at": "2026-04-29T18:36:50.341961",
       "answer_style_confirmed": true
     }
@@ -172,6 +172,6 @@
     "\"explain the difference between the deep learning technology used in the research paper and the smar": 1,
     "helllo": 1,
     "can you explain me what is salto key cards": 1,
-    "can you explain me what is salto key cards in detail": 3
+    "can you explain me what is salto key cards in detail": 6
   }
 }

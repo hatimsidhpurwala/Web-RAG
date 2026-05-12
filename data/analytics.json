@@ -2039,142 +2039,30 @@
       "web_search_used": true,
       "sources_count": 0,
       "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-12T23:48:04.961739",
+      "query": "can you explain me what is salto key cards in detail\n\n",
+      "answer_length": 275,
+      "confidence": 0.0,
+      "response_time_ms": 46789,
+      "web_search_used": true,
+      "sources_count": 0,
+      "user_feedback": ""
+    },
+    {
+      "timestamp": "2026-05-13T01:47:03.250815",
+      "query": "can you explain me what is salto key cards in detail",
+      "answer_length": 269,
+      "confidence": 0.0,
+      "response_time_ms": 25923,
+      "web_search_used": true,
+      "sources_count": 0,
+      "user_feedback": ""
     }
   ],
   "improvements_applied": [],
   "performance_history": [
-    {
-      "timestamp": "2026-05-09T14:45:58.011567",
-      "summary": {
-        "total_interactions": 175,
-        "avg_confidence": 0.715,
-        "avg_response_time_ms": 16218,
-        "web_search_rate": 0.411,
-        "failure_rate": 0.149,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:46:16.570236",
-      "summary": {
-        "total_interactions": 176,
-        "avg_confidence": 0.716,
-        "avg_response_time_ms": 16215,
-        "web_search_rate": 0.409,
-        "failure_rate": 0.148,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:46:43.298766",
-      "summary": {
-        "total_interactions": 176,
-        "avg_confidence": 0.716,
-        "avg_response_time_ms": 16215,
-        "web_search_rate": 0.409,
-        "failure_rate": 0.148,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:47:00.712966",
-      "summary": {
-        "total_interactions": 177,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16211,
-        "web_search_rate": 0.407,
-        "failure_rate": 0.147,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:52:07.926167",
-      "summary": {
-        "total_interactions": 177,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16211,
-        "web_search_rate": 0.407,
-        "failure_rate": 0.147,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T14:52:25.550012",
-      "summary": {
-        "total_interactions": 178,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16208,
-        "web_search_rate": 0.404,
-        "failure_rate": 0.146,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T15:11:18.617375",
-      "summary": {
-        "total_interactions": 178,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16208,
-        "web_search_rate": 0.404,
-        "failure_rate": 0.146,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T15:18:29.216402",
-      "summary": {
-        "total_interactions": 178,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16208,
-        "web_search_rate": 0.404,
-        "failure_rate": 0.146,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T15:20:24.914052",
-      "summary": {
-        "total_interactions": 178,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16208,
-        "web_search_rate": 0.404,
-        "failure_rate": 0.146,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T15:23:30.010622",
-      "summary": {
-        "total_interactions": 178,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16208,
-        "web_search_rate": 0.404,
-        "failure_rate": 0.146,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T15:37:03.440795",
-      "summary": {
-        "total_interactions": 178,
-        "avg_confidence": 0.717,
-        "avg_response_time_ms": 16208,
-        "web_search_rate": 0.404,
-        "failure_rate": 0.146,
-        "negative_feedback_count": 0
-      }
-    },
-    {
-      "timestamp": "2026-05-09T15:37:08.967495",
-      "summary": {
-        "total_interactions": 179,
-        "avg_confidence": 0.718,
-        "avg_response_time_ms": 16136,
-        "web_search_rate": 0.402,
-        "failure_rate": 0.145,
-        "negative_feedback_count": 0
-      }
-    },
     {
       "timestamp": "2026-05-09T15:39:18.094158",
       "summary": {
@@ -3030,6 +2918,138 @@
         "avg_response_time_ms": 19612,
         "web_search_rate": 0.392,
         "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:42:54.595196",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:45:47.722420",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:45:57.544949",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:46:09.781736",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:46:20.152534",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:47:18.130558",
+      "summary": {
+        "total_interactions": 204,
+        "avg_confidence": 0.708,
+        "avg_response_time_ms": 19612,
+        "web_search_rate": 0.392,
+        "failure_rate": 0.162,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-12T23:48:06.802347",
+      "summary": {
+        "total_interactions": 205,
+        "avg_confidence": 0.705,
+        "avg_response_time_ms": 19744,
+        "web_search_rate": 0.395,
+        "failure_rate": 0.166,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-13T01:43:49.422665",
+      "summary": {
+        "total_interactions": 205,
+        "avg_confidence": 0.705,
+        "avg_response_time_ms": 19744,
+        "web_search_rate": 0.395,
+        "failure_rate": 0.166,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-13T01:44:27.874470",
+      "summary": {
+        "total_interactions": 205,
+        "avg_confidence": 0.705,
+        "avg_response_time_ms": 19744,
+        "web_search_rate": 0.395,
+        "failure_rate": 0.166,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-13T01:46:28.370837",
+      "summary": {
+        "total_interactions": 205,
+        "avg_confidence": 0.705,
+        "avg_response_time_ms": 19744,
+        "web_search_rate": 0.395,
+        "failure_rate": 0.166,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-13T01:46:37.307636",
+      "summary": {
+        "total_interactions": 205,
+        "avg_confidence": 0.705,
+        "avg_response_time_ms": 19744,
+        "web_search_rate": 0.395,
+        "failure_rate": 0.166,
+        "negative_feedback_count": 0
+      }
+    },
+    {
+      "timestamp": "2026-05-13T01:47:04.326072",
+      "summary": {
+        "total_interactions": 206,
+        "avg_confidence": 0.701,
+        "avg_response_time_ms": 19774,
+        "web_search_rate": 0.398,
+        "failure_rate": 0.17,
         "negative_feedback_count": 0
       }
     }
