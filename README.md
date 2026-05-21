@@ -63,10 +63,6 @@ graph TD
         Synthesizer --> |Save new message to history| Mem
         Synthesizer --> |Send JSON/Text back to user| User
     end
-
-    style User fill:#f9f,stroke:#333,stroke-width:2px
-    style Brain fill:#bbf,stroke:#333,stroke-width:2px
-    style Mem fill:#bfb,stroke:#333,stroke-width:2px
 ```
 ### 1. 📥 The Front Door (Ingress & APIs)
 When a user sends a message, file, or voice note, it hits one of our APIs:
