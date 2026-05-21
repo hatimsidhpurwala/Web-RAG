@@ -21,6 +21,53 @@ A state-of-the-art, multi-modal AI architecture that ingests text, images, voice
 
 Our system is broken down into four distinct stages that process a user's request from the moment it hits the server to the final response.
 
+```mermaid
+graph TD
+    %% Users / Platforms
+    User[📱 User sends a message or file] --> FrontDoor
+
+    %% Stage 1: Front Door
+    subgraph "Stage 1: The Front Door (APIs)"
+        FrontDoor{Where did it come from?}
+        FrontDoor -->|Streamlit Website| UI[streamlit_app.py]
+        FrontDoor -->|Telegram/Insta Webhook| API[rest_api.py]
+        FrontDoor -->|Twilio WhatsApp| WA[whatsapp_webhook.py]
+    end
+
+    %% Stage 2: Processing
+    subgraph "Stage 2: Translators & Memory"
+        UI --> |Extract Text| Parser(document_parser.py)
+        API --> |Extract Text| Parser
+        WA --> |Extract Text| Parser
+        
+        UI --> |Load Chat History| Mem(session_manager.py)
+        API --> |Load Chat History| Mem
+        WA --> |Load Chat History| Mem
+    end
+
+    %% Stage 3: The Brain (LangGraph)
+    subgraph "Stage 3: The AI Brain (LangGraph Agent)"
+        Parser --> Brain(agent_graph.py)
+        Mem --> Brain
+        
+        Brain -->|1. Classify Intent| Nodes1(nodes.py: Intent Check)
+        Nodes1 -->|2. Search Vector DB| Retriever(retriever.py -> Qdrant)
+        Nodes1 -->|3. Search Internet| Web(web_searcher.py -> DuckDuckGo)
+        
+        Retriever --> Synthesizer(nodes.py: Generate Answer)
+        Web --> Synthesizer
+    end
+
+    %% Stage 4: Output
+    subgraph "Stage 4: The Output"
+        Synthesizer --> |Save new message to history| Mem
+        Synthesizer --> |Send JSON/Text back to user| User
+    end
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Brain fill:#bbf,stroke:#333,stroke-width:2px
+    style Mem fill:#bfb,stroke:#333,stroke-width:2px
+```
 ### 1. 📥 The Front Door (Ingress & APIs)
 When a user sends a message, file, or voice note, it hits one of our APIs:
 - **Streamlit UI:** The visual chat interface.
