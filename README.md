@@ -17,32 +17,77 @@ A state-of-the-art, multi-modal AI architecture that ingests text, images, voice
 
 ---
 
-## 🏗️ Architectural Pipeline
+## 🏗️ Detailed Pipeline Architecture
+
+Our system is broken down into four distinct stages that process a user's request from the moment it hits the server to the final response.
+
+### 1. 📥 The Front Door (Ingress & APIs)
+When a user sends a message, file, or voice note, it hits one of our APIs:
+- **Streamlit UI:** The visual chat interface.
+- **REST API (`/api/ask`):** A standard JSON endpoint for custom software.
+- **Universal Webhook (`/api/webhook/universal`):** Auto-detects payloads from Telegram, Instagram, Twilio, and Zapier, extracts the user ID, and passes it forward.
+
+### 2. 🔀 The Translators (Parsing & Memory)
+The AI only understands text, so we have to convert the raw inputs:
+- **`document_parser.py`:** If the input is a PDF, Excel, Word document, or image, this file extracts the raw text. If it is an audio file, it uses Groq Whisper to transcribe it.
+- **`session_manager.py`:** At the exact same time, this file looks up the user's ID to fetch their previous chat history so the AI remembers the conversation context.
+
+### 3. 📚 The Librarian (Vectorization & Qdrant)
+If the user uploaded a massive document, we can't feed it all to the AI at once.
+- **`chunker.py`:** Cuts the extracted text into bite-sized 500-word paragraphs.
+- **`embedder.py`:** Converts those paragraphs into numbers (vectors).
+- **`vector_store.py`:** Saves those vectors securely into Qdrant (our Vector Database), explicitly tagged with the user's `session_id` to ensure absolute data privacy.
+
+### 4. 🧠 The Brain (LangGraph Agent Orchestrator)
+Finally, the text and chat history reach the AI core (`agent_graph.py`):
+1. **Intent Classification:** The AI looks at the prompt and decides if it needs to search the uploaded document, search the live internet, or just have a normal conversation.
+2. **Retrieval:** It asks Qdrant for the most relevant "chunks" of text related to the question.
+3. **Web Fallback (`web_searcher.py`):** If Qdrant doesn't have the answer, the AI autonomously opens DuckDuckGo, scrapes 3 websites, and learns the answer on the fly.
+4. **Synthesis:** The AI fuses the retrieved data with the chat history, generates a final factual response, saves the new memory back to the `session_manager`, and sends the answer back out the Front Door to the user.
+
+---
+
+## 📁 Modular Project Structure & File Understandings
 
 ```
-       [ Any Platform: Web / Telegram / WhatsApp / REST ]
-                               │
-                               ▼
-+---------------------------------------------------------------+
-|                      UNIVERSAL FASTAPI                        |
-|   /api/webhook/universal   |   /api/ask   |   /api/upload     |
-+---------------------------------------------------------------+
-                               │
-            +------------------+------------------+
-            ▼                                     ▼
-+-------------------------+            +--------------------------+
-|  document_parser.py     |            | session_manager.py       |
-| (PDF, Excel, Word, OCR) |            | (Persistent JSON state)  |
-+-------------------------+            +--------------------------+
-            │                                     │
-            +------------------+------------------+
-                               ▼
-+---------------------------------------------------------------+
-|                 LANGGRAPH AGENT ORCHESTRATOR                  |
-| 1. Intent Classification          4. Web Fallback             |
-| 2. Multimodal Fusion              5. Synthesis & Fact Check   |
-| 3. Qdrant Vector DB Retrieval     6. Confidence Scoring       |
-+---------------------------------------------------------------+
+universal-web-scraper/
+├── src/
+│   ├── core/                     # Data processing & extraction
+│   │   ├── document_parser.py    # Universal doc extraction (Rips text from PDF, Excel, Word, OCR, Audio)
+│   │   ├── scraper.py            # Fetches raw HTML from URLs and cleanly converts it to Markdown
+│   │   ├── cleaner.py            # Normalizes text by removing excessive whitespace and unicode artifacts
+│   │   ├── chunker.py            # Splits massive documents into smaller, semantic 500-word blocks
+│   │   ├── embedder.py           # Transforms text chunks into mathematical vectors using MiniLM
+│   │   └── contact_extractor.py  # Hybrid extraction for specialized contact/lead identification
+│   ├── database/                 # Data persistence & state management
+│   │   ├── session_manager.py    # Centralized persistent JSON chat memory mapped by session_id
+│   │   ├── metadata_registry.py  # Generates and stores quick AI summaries/profiles of uploaded documents
+│   │   └── vector_store.py       # Handles all read/write/delete operations with the Qdrant database
+│   ├── api/                      # Ingress Endpoints
+│   │   ├── rest_api.py           # Universal FastAPI backend hosting /api/ask and the Universal Webhook
+│   │   ├── streamlit_app.py      # The primary ChatGPT-style visual web interface
+│   │   └── whatsapp_webhook.py   # Legacy endpoint specifically formatted to handle Twilio's XML requirements
+│   ├── ui/                       # UI Rendering Modules
+│   │   ├── renderers.py          # Streamlit helper functions to draw confidence bars, sources, and fact checks
+│   │   └── styles.py             # Global CSS abstraction to keep the Streamlit app clean and premium
+│   ├── agents/                   # LangGraph AI Agent Logic
+│   │   ├── agent_graph.py        # The central orchestrator that routes data between all sub-agents
+│   │   ├── intent_classifier.py  # Determines if the user wants to chat, search docs, or search the web
+│   │   ├── query_generator.py    # Rewrites user questions into optimized search queries for the database
+│   │   ├── retriever.py          # The logic that actually fetches the vector chunks from Qdrant
+│   │   ├── web_searcher.py       # Autonomously triggers DuckDuckGo, scrapes links, and embeds new knowledge
+│   │   ├── response_generator.py # Synthesizes the final answer using retrieved context and chat history
+│   │   ├── fact_verifier.py      # Double-checks the AI's final answer against the source documents for hallucinations
+│   │   └── sentiment_adapter.py  # Adjusts the AI's tone based on the user's emotional state
+│   └── utils/
+│       ├── indexer.py            # Batch processing script for indexing massive directories of local files
+│       └── assets.py             # Global constants, avatars, and application descriptions
+├── config/                       # Settings & API keys
+│   ├── .env.example              # Template for environment variables
+│   └── settings.py               # Loads environment variables into Python safely
+├── requirements.txt              # Core Python dependencies (FastAPI, Streamlit, LangGraph, etc)
+├── run_all.py                    # A master startup script that runs both the FastAPI and Streamlit servers
+└── README.md                     # You are reading it right now!
 ```
 
 ---
@@ -75,11 +120,6 @@ GROQ_API_KEY=gsk_your_groq_api_key
 # Required for Universal Models (Gemini routing)
 GOOGLE_API_KEY=AIza_your_google_key
 
-# Required for Twilio integration (Optional for universal)
-TWILIO_ACCOUNT_SID=your_sid
-TWILIO_AUTH_TOKEN=your_token
-TWILIO_WHATSAPP_NUMBER=+14155238886
-
 # Required for Persistent Vector Storage (Cloud)
 QDRANT_URL=https://your-qdrant-cluster.cloud.qdrant.io
 QDRANT_API_KEY=your_qdrant_key
@@ -110,41 +150,6 @@ The webhook automatically parses:
 - Standard `application/json` (`{"session_id": "123", "message": "hello"}`)
 
 You no longer need specific endpoint mapping for standard integrations.
-
----
-
-## 📁 Modular Project Structure
-
-```
-universal-web-scraper/
-├── src/
-│   ├── core/             # Data processing & extraction
-│   │   ├── document_parser.py    # Universal doc extraction (PDF, Excel, Word, etc)
-│   │   ├── scraper.py            # HTML → Markdown
-│   │   ├── cleaner.py            # Text normalisation
-│   │   ├── chunker.py            # Document chunking
-│   │   └── embedder.py           # Embedding generation
-│   ├── database/         # Data persistence & state management
-│   │   ├── session_manager.py    # Centralized persistent JSON chat memory
-│   │   ├── metadata_registry.py  # Stores document profiles
-│   │   └── vector_store.py       # Qdrant operations
-│   ├── api/              # Ingress Endpoints
-│   │   ├── rest_api.py           # Universal FastAPI backend & Webhooks
-│   │   ├── streamlit_app.py      # Main Chat UI
-│   │   └── whatsapp_webhook.py   # Legacy direct twilio adapter
-│   ├── ui/               # UI Rendering Modules
-│   │   ├── renderers.py          # Visual component rendering 
-│   │   └── styles.py             # Global CSS abstraction
-│   ├── agents/           # LangGraph Agent logic
-│   │   ├── agent_graph.py        # Central Orchestrator
-│   │   └── ...                   # Sub-agent implementations
-│   └── utils/
-├── config/               # Settings & API keys
-├── data/                 # JSON memory & markdown storage
-├── requirements.txt      # Core Dependencies
-├── run_all.py            # Start script
-└── README.md
-```
 
 ---
 
