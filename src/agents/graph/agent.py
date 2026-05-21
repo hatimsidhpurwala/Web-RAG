@@ -67,6 +67,7 @@ class RAGAgent:
         user_id: str = "default",
         enable_fact_check: bool = True,
         active_doc_sites: Optional[List[str]] = None,
+        session_id: str = "shared",
     ) -> Dict[str, Any]:
         """Process *question* through the full enhanced RAG pipeline.
 
@@ -85,6 +86,11 @@ class RAGAgent:
             (e.g. ``["pdf_Datasheet-SALTO"]``).  When provided and the
             question appears to be about an uploaded document, retrieval
             is restricted to ``pdf_*`` sources so web content is ignored.
+        session_id : str
+            Unique identifier for this browser session (UUID).  Used to
+            namespace all Qdrant site_name tags and as the LangGraph
+            MemorySaver thread_id so each user's data and conversation
+            history are completely isolated from all other users.
         """
         start_time = time.time()
 
@@ -209,9 +215,13 @@ class RAGAgent:
                     logger.info("Specific PDF referenced via Metadata: %s", site)
                     break
 
-        # Use specific_prefix if matched, else fallback to searching all PDFs if general document question
-        source_prefix: Optional[str] = specific_prefix if specific_prefix else ("pdf_" if (is_document_q and has_active_docs) else None)
-        
+        # Use specific_prefix if matched, else fallback to searching all PDFs
+        # for this user. The prefix is session-scoped (pdf_{session_id}_) so
+        # different users' uploaded documents never appear in each other's results.
+        _pdf_prefix = f"pdf_{session_id}_" if session_id != "shared" else "pdf_"
+        source_prefix: Optional[str] = specific_prefix if specific_prefix else (_pdf_prefix if (is_document_q and has_active_docs) else None)
+
+
         if source_prefix:
             logger.info(
                 "Document question detected – restricting retrieval to '%s' "
@@ -221,14 +231,15 @@ class RAGAgent:
 
         # ── 4. Build initial state and run graph ────────────────────────
         initial_state: AgentState = {
-            "question": enhanced_question,
-            "original_question": question,
+            "session_id":          session_id,
+            "question":            enhanced_question,
+            "original_question":   question,
             "conversation_history": conversation_history or [],
             "web_search_performed": False,
-            "query_strategy": strategy.model_dump(),
-            "sentiment": sentiment,
-            "conversation_state": conv_state,
-            "language_info": lang_info,
+            "query_strategy":      strategy.model_dump(),
+            "sentiment":           sentiment,
+            "conversation_state":  conv_state,
+            "language_info":       lang_info,
             "enhanced_features_used": [],
         }
         if source_prefix:
@@ -236,17 +247,20 @@ class RAGAgent:
         if active_doc_sites:
             initial_state["active_doc_sites"] = active_doc_sites
 
+        # Use session_id as the LangGraph MemorySaver thread_id so each
+        # user's conversation checkpoint is stored independently in memory.
+        graph_config = {"configurable": {"thread_id": session_id}}
         try:
-            result = self.graph.invoke(initial_state)
+            result = self.graph.invoke(initial_state, config=graph_config)
         except Exception as exc:
             logger.error("Graph invocation failed: %s", exc, exc_info=True)
             result = {
-                "question": question,
+                "question":    question,
                 "final_answer": "I'm sorry, I encountered an error. Please try again.",
-                "confidence": 0.0,
-                "sources": [],
+                "confidence":  0.0,
+                "sources":     [],
                 "follow_up_suggestions": [],
-                "web_search_performed": False,
+                "web_search_performed":  False,
                 "enhanced_features_used": [],
             }
 
@@ -280,7 +294,9 @@ class RAGAgent:
                 confidence, _intent, enhanced_question[:80],
             )
             try:
-                research = self._deep_research(enhanced_question, conversation_history)
+                research = self._deep_research(
+                    enhanced_question, conversation_history, session_id=session_id
+                )
                 # Always adopt web research answer if web search was run —
                 # even if confidence didn't improve, raw web data is better
                 # than a vague 'info not available' answer.
@@ -364,11 +380,12 @@ class RAGAgent:
         self,
         topic: str,
         conversation_history: Optional[List[dict]] = None,
+        session_id: str = "shared",
     ) -> Dict[str, Any]:
         """Run deep web research and return a fresh answer."""
         logger.info("Deep research (auto): %s", topic[:80])
         try:
-            info = deep_research(topic, self.vector_store)
+            info = deep_research(topic, self.vector_store, session_id=session_id)
         except Exception as exc:
             logger.error("Deep research failed: %s", exc)
             info = {"queries_used": [], "sites_indexed": [], "total_chunks": 0, "raw_results": []}

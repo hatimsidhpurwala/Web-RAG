@@ -29,6 +29,7 @@ def retrieve_chunks(
     final_top_k: int = TOP_K_RESULTS,
     similarity_threshold: float = SIMILARITY_THRESHOLD,
     source_prefix: Optional[str] = None,
+    session_id: Optional[str] = None,
 ) -> List[dict]:
     """Retrieve and deduplicate the most relevant chunks for *queries*.
 
@@ -48,6 +49,11 @@ def retrieve_chunks(
         If given (e.g. ``"pdf_"``), restrict the search to chunks whose
         ``site_name`` starts with this prefix.  Falls back to all sources
         if no results are found with the prefix filter.
+    session_id : str | None
+        When provided, all searches are further constrained to only chunks
+        whose ``site_name`` begins with ``"{session_id}:"`` or the PDF
+        prefix ``"pdf_{session_id}_"`` so different users' data never mix.
+        When *source_prefix* is also given it takes precedence.
 
     Returns
     -------
@@ -57,6 +63,17 @@ def retrieve_chunks(
     all_results: list[dict] = []
     seen_texts: set[str] = set()
     effective_top_k = max(top_k_per_query, 5)
+
+    # When session_id is given and no explicit source_prefix, scope the search
+    # to the current user's namespace so other users' chunks are invisible.
+    # The namespace prefix for session-scoped web chunks is "{session_id}:"
+    # and for PDF chunks it is "pdf_{session_id}_" (set by streamlit_app.py).
+    # If source_prefix is already set (e.g. "pdf_abc123_") it takes precedence.
+    if session_id and not source_prefix:
+        source_prefix = f"{session_id}:"
+        logger.debug(
+            "Retriever: auto-scoping search to session namespace '%s'", source_prefix
+        )
 
     def _search(query: str, prefix: Optional[str], threshold: Optional[float]) -> List[dict]:
         """Embed query and search – with or without source prefix.

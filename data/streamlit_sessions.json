@@ -1,0 +1,107 @@
+{
+  "+91 7427068253": [
+    {
+      "role": "user",
+      "content": "hello "
+    },
+    {
+      "role": "assistant",
+      "content": "Hello, it's lovely to meet you, how can I assist you today?",
+      "meta": {
+        "confidence": 1.0,
+        "sources": [],
+        "web_search": false,
+        "follow_ups": [],
+        "fact_check_report": null,
+        "features": [
+          "intent_classification",
+          "sentiment_adaptation"
+        ],
+        "response_time_ms": 12237,
+        "conversation_state": {
+          "state": "new_topic",
+          "enhanced_query": "hello ",
+          "current_topic": "hello ",
+          "topic_threads": [],
+          "is_correction": false
+        },
+        "quality_score": null
+      }
+    },
+    {
+      "role": "user",
+      "content": "explain me the pdf hatim_cvv in detail which i  have uploaded right now"
+    },
+    {
+      "role": "assistant",
+      "content": "The document `Hatim_cvv.pdf` is a resume for **Hatim Sidhpurwala**, outlining his academic background, professional experience, technical skills, and key projects.\n\n**Contact Information**\n\u2013 Phone: +91 7427068253\n\u2013 Email: hatsid000@gmail.com\n\u2013 LinkedIn: linkedin.com/in/hatimsidhpurwala\n\u2013 Location: Udaipur, Rajasthan, India\n\n**Education**\n\u2013 **B.Tech \u2014 Computer Science & Engineering**\n  \u2013 Sir Padampat Singhania University, Udaipur\n  \u2013 October 2022 \u2013 May 2026\n  \u2013 CGPA: 8.23 / 10.0\n  \u2013 Coursework: DSA, DBMS, Operating Systems, Computer Architecture, IoT, Networks\n\u2013 **ICSE 12th \u2014 Physics, Chemistry, Mathematics**\n  \u2013 MSB Educational Institute, Banswara\n  \u2013 March 2022\n  \u2013 Grade: 83.2%\n\n**Professional Experience**\n\u2013 **IT Systems Intern** \u2014 Sir Padampat Singhania University (February 2025 \u2013 July 2025)\n  \u2013 Responsibilities included IT Operations, Helpdesk Management, End-User Support, Technical Troubleshooting, and SOP Documentation.\n  \u2013 Provided technical support to over 200 users, diagnosing and resolving hardware and software issues.\n\u2013 **Business Analyst Intern** \u2014 (Dates not specified in provided context)\n  \u2013 Focused on data analysis and workflow automation.\n  \u2013 Streamlined data processes by automating manual data pulls.\n\u2013 **QA Analyst** \u2014 Mechlin Technologies (January 2026 \u2013 March 2026)\n  \u2013 Specialized in Quality Assurance, Manual & Regression Testing, Bug Lifecycle Management, JIRA, Agile/Scrum, and UAT.\n  \u2013 Designed and executed over 60 manual test cases across four application modules, achieving zero critical defect leakage to production.\n  \u2013 Identified, logged, and tracked more than 25 defects in JIRA with detailed reproduction steps and severity classifications.\n  \u2013 Operated fully remote and asynchronously, managing testing schedules and prioritizing tasks independently.\n  \u2013 Participated in daily Agile stand-ups and sprint reviews, communicating defect status to developers and the Product Manager.\n\n**Technical Skills**\n\u2013 **WordPress**: WordPress.com site management, WooCommerce setup & configuration, plugin troubleshooting, theme customization, PHP basics, WordPress REST API, permalink & .htaccess fixes.\n\u2013 **Customer Support**: End-user technical support (200+ users), helpdesk ticket management, first-contact resolution, knowledge base authoring, plain-language technical writing.\n\u2013 **AI & Automation**: Claude API, OpenAI API, prompt engineering, AI triage workflow design, n8n automation, Python scripting for workflow automation, AI-assisted reporting.\n\u2013 **BA Tools**: JIRA, Confluence, Draw.io, MS Excel (KPI Dashboards, PivotTables), Google Workspace, Requirement Workshops, BRD / FRD Documentation.\n\u2013 **Data & Analytics**: Python (Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn), SQL, Power BI, Tableau, Data Cleaning, EDA, Feature Engineering, Predictive Modeling, A/B Testing, Statistical Analysis.\n\n**Key Projects**\n\u2013 **WordPress & WooCommerce Customer Support Simulation** (2026)\n  \u2013 Built and configured a functional WordPress.com site with WooCommerce, setting up product catalog, payment gateway, tax rules, shipping zones, and customer account management.\n\u2013 **Credit Risk Prediction System** (2025)\n  \u2013 Stack: Python, XGBoost, Scikit-learn, Pandas, SMOTE, SHAP, SQL.\n  \u2013 Performed end-to-end Exploratory Data Analysis (EDA) on over 5,000 loan records.\n  \u2013 Addressed severe class imbalance using SMOTE oversampling and benchmarked its impact across various metrics (Precision, Recall, F1-score, ROC-AUC).\n  \u2013 Delivered a comprehensive model performance report suite, including ROC-AUC curve, confusion matrix, and SHAP-based feature importance analysis.\n  \u2013 Authored a non-technical executive summary to translate model outputs into credit policy recommendations.",
+      "meta": {
+        "confidence": 0.9,
+        "sources": [
+          "Hatim_cvv.pdf",
+          "pdf_+91 7427068253_be9"
+        ],
+        "web_search": false,
+        "follow_ups": [],
+        "fact_check_report": {
+          "overall_reliability": 0.7,
+          "verification_summary": "No specific factual claims to verify.",
+          "contradictions": [],
+          "claims_count": 0
+        },
+        "features": [
+          "intent_classification",
+          "query_optimization",
+          "fact_verification",
+          "sentiment_adaptation"
+        ],
+        "response_time_ms": 27753,
+        "conversation_state": {
+          "state": "followup",
+          "enhanced_query": "Explain the PDF hatim_cvv, which I have uploaded, in detail",
+          "current_topic": "PDF hatim_cvv",
+          "previous_topic": null,
+          "topic_threads": [
+            {
+              "topic": "PDF hatim_cvv",
+              "status": "active",
+              "summary": "User requested explanation of uploaded PDF"
+            }
+          ],
+          "is_correction": false
+        },
+        "quality_score": null
+      }
+    }
+  ],
+  "+919413601252": [
+    {
+      "role": "user",
+      "content": "hello "
+    },
+    {
+      "role": "assistant",
+      "content": "Hello, it's lovely to meet you, how can I assist you today?",
+      "meta": {
+        "confidence": 1.0,
+        "sources": [],
+        "web_search": false,
+        "follow_ups": [],
+        "fact_check_report": null,
+        "features": [
+          "intent_classification",
+          "sentiment_adaptation"
+        ],
+        "response_time_ms": 5033,
+        "conversation_state": {
+          "state": "new_topic",
+          "enhanced_query": "hello ",
+          "current_topic": "hello ",
+          "topic_threads": [],
+          "is_correction": false
+        },
+        "quality_score": null
+      }
+    }
+  ]
+}

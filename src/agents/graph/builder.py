@@ -4,11 +4,23 @@ Graph builder for the LangGraph agent pipeline.
 This module's single job is to wire nodes and edges together and
 return a compiled LangGraph.  It knows nothing about business logic –
 that lives in nodes.py and routers.py.
+
+Multi-user isolation
+--------------------
+The compiled graph is built with a ``MemorySaver`` checkpointer.
+When callers invoke the graph they must pass::
+
+    config = {"configurable": {"thread_id": session_id}}
+
+This gives every user their own isolated conversation thread in memory.
+Different users' states never mix, and each user's conversation history
+is preserved across turns within the same browser session.
 """
 
 from __future__ import annotations
 
 from langgraph.graph import END, StateGraph
+from langgraph.checkpoint.memory import MemorySaver
 
 from src.agents.graph.state import AgentState
 from src.agents.graph.routers import route_after_intent, route_after_response
@@ -17,7 +29,7 @@ from src.database.vector_store import VectorStore
 
 
 def build_graph(vector_store: VectorStore):
-    """Construct and compile the full agent graph.
+    """Construct and compile the full agent graph with per-user checkpointing.
 
     Parameters
     ----------
@@ -27,7 +39,10 @@ def build_graph(vector_store: VectorStore):
     Returns
     -------
     CompiledGraph
-        Ready to call with `graph.invoke(initial_state)`.
+        Ready to call with::
+
+            graph.invoke(initial_state,
+                         config={"configurable": {"thread_id": session_id}})
     """
     graph = StateGraph(AgentState)
 
@@ -74,4 +89,8 @@ def build_graph(vector_store: VectorStore):
     graph.add_edge("re_retrieve",          "re_generate_response")
     graph.add_edge("re_generate_response", END)
 
-    return graph.compile()
+    # ── MemorySaver: per-thread (per-user) conversation checkpointing ──
+    # Each user's session_id is used as the thread_id at call time.
+    # This means every user gets completely isolated conversation memory.
+    checkpointer = MemorySaver()
+    return graph.compile(checkpointer=checkpointer)

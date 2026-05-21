@@ -28,9 +28,6 @@ logging.basicConfig(
     format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s",
 )
 
-# ======================================================================
-# Application setup
-# ======================================================================
 
 app = FastAPI(title=APP_NAME, version=APP_VERSION, description=APP_DESCRIPTION)
 
@@ -45,14 +42,10 @@ def _get_agent() -> RAGAgent:
     return _agent
 
 
-# In-memory session store: phone → list of message dicts
-_user_sessions: Dict[str, List[dict]] = defaultdict(list)
-_MAX_HISTORY = 10  # keep last 10 messages (5 exchanges)
+from src.database.session_manager import load_sessions as _load_sessions
+from src.database.session_manager import save_sessions as _save_sessions
+from src.database.session_manager import MAX_HISTORY as _MAX_HISTORY
 
-
-# ======================================================================
-# Endpoints
-# ======================================================================
 
 @app.get("/", tags=["info"])
 async def root():
@@ -81,10 +74,6 @@ async def whatsapp_webhook(
 ):
     """Receive a WhatsApp message from Twilio, process it, and return a
     TwiML response.
-
-    Twilio sends form-encoded data with (among others):
-    - ``From`` – the sender's WhatsApp number
-    - ``Body`` – the message text
     """
     user_number = From.replace("whatsapp:", "").strip()
     message = Body.strip()
@@ -94,12 +83,26 @@ async def whatsapp_webhook(
     if not message:
         return _twiml_response("I didn't receive a message. Please try again.")
 
-    # Load conversation history
-    history = _user_sessions[user_number]
+    # ── Handle Reset Command ──
+    if message.lower() in ["reset", "clear", "restart"]:
+        try:
+            sessions_db = _load_sessions()
+            if user_number in sessions_db:
+                del sessions_db[user_number]
+                _save_sessions(sessions_db)
+            return _twiml_response("🧹 Your conversation history has been cleared! How can I help you today?")
+        except Exception as exc:
+            logger.error("Failed to clear session: %s", exc)
+            return _twiml_response("Failed to clear history. Please try again.")
+
+    # ── Load Persistent Conversation History ──
+    sessions_db = _load_sessions()
+    history = sessions_db.get(user_number, [])
 
     try:
         agent = _get_agent()
-        result = agent.ask(message, conversation_history=history)
+        # Pass the phone number as the session_id so LangGraph isolates the thread
+        result = agent.ask(message, conversation_history=history, session_id=user_number)
         answer = result.get("final_answer", "Sorry, I couldn't process that.")
 
         # Append sources if available
@@ -114,10 +117,13 @@ async def whatsapp_webhook(
         logger.error("Error processing WhatsApp message: %s", exc, exc_info=True)
         answer = "I ran into an error processing your message. Please try again."
 
-    # Update history
+    # ── Update and Save Persistent History ──
     history.append({"role": "user", "content": message})
     history.append({"role": "assistant", "content": answer})
-    _user_sessions[user_number] = history[-_MAX_HISTORY:]
+    
+    # Enforce rolling window memory
+    sessions_db[user_number] = history[-_MAX_HISTORY:]
+    _save_sessions(sessions_db)
 
     return _twiml_response(answer)
 

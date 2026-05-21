@@ -111,6 +111,12 @@ def make_node_retrieve_chunks(vector_store: "VectorStore"):
         source_prefix = state.get("source_prefix")
         if source_prefix:
             kwargs["source_prefix"] = source_prefix
+        else:
+            # No explicit source_prefix — scope search to this user's namespace
+            # so chunks from other users' sessions are never returned.
+            session_id = state.get("session_id")
+            if session_id:
+                kwargs["session_id"] = session_id
 
         chunks = retrieve_chunks(
             state.get("generated_queries", [state["question"]]),
@@ -142,6 +148,7 @@ def make_node_retrieve_chunks(vector_store: "VectorStore"):
                 chunks = profile_chunks + chunks
 
         return {"retrieved_chunks": chunks}
+
 
     return node_retrieve_chunks
 
@@ -190,22 +197,27 @@ def make_node_web_search(vector_store: "VectorStore"):
         logger.info(
             "Web search triggered (confidence=%.2f)", state.get("confidence", 0)
         )
+        # Each user's scraped data is namespaced under their session_id
+        # so it never collides with another user's data in Qdrant.
+        session_id = state.get("session_id", "shared")
         try:
             queries = state.get("generated_queries", [state["question"]])
             # Run max 2 optimized queries to keep response time reasonable
             queries_to_run = queries[:2]
-            
+
             all_sites = []
             all_raw = []
             total_chunks = 0
-            
+
             for q in queries_to_run:
                 logger.info("Executing web search for optimized query: '%s'", q)
-                info_q = search_and_scrape(q, vector_store, max_results=3)
+                info_q = search_and_scrape(
+                    q, vector_store, max_results=3, session_id=session_id
+                )
                 all_sites.extend(info_q["sites_indexed"])
                 all_raw.extend(info_q.get("raw_results", []))
                 total_chunks += info_q["total_chunks"]
-                
+
             # De-duplicate raw results by URL
             seen_urls = set()
             deduped_raw = []
@@ -213,11 +225,11 @@ def make_node_web_search(vector_store: "VectorStore"):
                 if r["url"] not in seen_urls:
                     seen_urls.add(r["url"])
                     deduped_raw.append(r)
-                    
+
             info = {
                 "sites_indexed": all_sites,
                 "total_chunks": total_chunks,
-                "raw_results": deduped_raw
+                "raw_results": deduped_raw,
             }
         except Exception as exc:
             logger.error("Web search failed: %s", exc)
@@ -243,10 +255,20 @@ def make_node_re_retrieve(vector_store: "VectorStore"):
     """Factory: returns a node function bound to *vector_store*."""
 
     def node_re_retrieve(state: AgentState) -> dict:
-        """Re-search the vector store after web content has been indexed."""
+        """Re-search the vector store after web content has been indexed.
+
+        Scopes the search to the current user's session namespace so that
+        freshly-indexed web chunks from other users are never mixed in.
+        """
         queries = state.get("generated_queries", [state["question"]])
+        session_id = state.get("session_id", "shared")
         try:
-            chunks = retrieve_chunks(queries, vector_store)
+            # Re-retrieve only within this user's web-search namespace
+            chunks = retrieve_chunks(
+                queries,
+                vector_store,
+                session_id=session_id,
+            )
         except Exception as exc:
             logger.error("Re-retrieval failed: %s", exc)
             chunks = state.get("retrieved_chunks", [])

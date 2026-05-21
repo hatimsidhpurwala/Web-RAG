@@ -12,6 +12,9 @@ from typing import Any, Dict, List, TypedDict
 
 
 class AgentState(TypedDict, total=False):
+    # ── Session isolation ───────────────────────────────────────────────
+    session_id: str             # unique UUID per browser tab / user session
+
     # ── Core pipeline fields ────────────────────────────────────────────
     question: str               # the (possibly enhanced) working question
     original_question: str      # raw user input before translation / rewrite

@@ -215,6 +215,15 @@ if "active_doc_sites" not in st.session_state:
     # when the user asks about an uploaded document.
     st.session_state.active_doc_sites: list[str] = []
 
+# ── Session ID: unique UUID per browser tab / user ──────────────────────
+# Generated once and stored in session_state so it survives Streamlit reruns
+# within the same tab but is different for every new browser tab / user.
+# Every Qdrant site_name tag, file cache path, and LangGraph thread_id is
+# prefixed with this ID to guarantee complete data isolation between users.
+if "session_id" not in st.session_state:
+    import uuid
+    st.session_state.session_id = str(uuid.uuid4())
+
 
 # ======================================================================
 # Multi-modal helpers
@@ -295,8 +304,10 @@ def process_input(text: str, file=None, audio_bytes=None, force_reindex: bool = 
             input_type = "image"
             actions.append(f"🖼️ OCR: {len(ocr_text)} chars")
 
-        elif ext in SUPPORTED_PDF_EXTENSIONS:
-            site_name = f"pdf_{file_hash}"
+        else:
+            # Universal document handler (PDF, Word, Excel, CSV, PPT, Text)
+            session_id = st.session_state.get("session_id", "shared")
+            site_name = f"doc_{session_id}_{file_hash}"
             from src.database.metadata_registry import MetadataRegistry
             registry = MetadataRegistry()
             existing_profile = registry.get_profile(site_name)
@@ -305,20 +316,28 @@ def process_input(text: str, file=None, audio_bytes=None, force_reindex: bool = 
                 actions.append(f"📄 Found in memory: {file.name}")
                 pdf_text = f"Document Profile: {existing_profile.get('summary', '')}"
             else:
-                with st.spinner("📄 Extracting & Profiling PDF…"):
-                    pdf_text = extract_pdf_text(raw)
-                    from src.agents.document_profiler import profile_document
-                    profile = profile_document(pdf_text)
-                    profile["original_filename"] = file.name
-                    registry.save_profile(site_name, profile)
-                
-                with st.spinner("📦 Indexing PDF…"):
-                    vs.clear_site(site_name)
-                    stored = index_text_content(pdf_text, site_name, vs)
-                actions.append(f"📄 Indexed PDF → {stored} chunks")
+                with st.spinner(f"📄 Extracting & Profiling {ext.upper()}…"):
+                    try:
+                        from src.core.document_parser import extract_text_from_file
+                        # Reuse the powerful universal extractors from the core logic
+                        doc_text, cat = extract_text_from_file(raw, file.name)
+                        pdf_text = doc_text
+                        
+                        from src.agents.document_profiler import profile_document
+                        profile = profile_document(pdf_text)
+                        profile["original_filename"] = file.name
+                        registry.save_profile(site_name, profile)
+                        
+                        with st.spinner(f"📦 Indexing {cat.upper()}…"):
+                            vs.clear_site(site_name)
+                            stored = index_text_content(pdf_text, site_name, vs)
+                        actions.append(f"📄 Indexed {cat} → {stored} chunks")
+                    except Exception as e:
+                        pdf_text = ""
+                        actions.append(f"❌ Failed to parse {ext}: {e}")
 
             processed_text = pdf_text[:500] + ("…" if len(pdf_text) > 500 else "")
-            input_type = "pdf"
+            input_type = "doc"
             scraped_sites.append(site_name)
             if site_name not in st.session_state.active_doc_sites:
                 st.session_state.active_doc_sites.append(site_name)
@@ -334,7 +353,10 @@ def process_input(text: str, file=None, audio_bytes=None, force_reindex: bool = 
                 from datetime import datetime
                 domain = urlparse(url).netloc.replace("www.", "")
                 ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-                site_name = f"web_{domain}_{ts}"
+                # Namespace scraped URL data with the session_id so different
+                # users' researched pages never collide in Qdrant.
+                session_id = st.session_state.get("session_id", "shared")
+                site_name = f"{session_id}:web_{domain}_{ts}"
                 stored = index_text_content(md, site_name, vs)
                 actions.append(f"🌐 Scraped {url} → {stored} chunks")
                 scraped_sites.append(site_name)
@@ -363,82 +385,7 @@ def process_input(text: str, file=None, audio_bytes=None, force_reindex: bool = 
 # ======================================================================
 # Render helpers
 # ======================================================================
-
-def render_confidence(conf: float):
-    color = "#22c55e" if conf >= 0.8 else "#eab308" if conf >= 0.6 else "#ef4444"
-    st.markdown(
-        f"<div style='display:flex;align-items:center;gap:8px;'>"
-        f"<span style='font-size:0.8rem;color:{color};'>Confidence: {conf:.0%}</span>"
-        f"<div style='flex:1;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;'>"
-        f"<div class='confidence-bar' style='width:{conf*100:.0f}%;background:{color};'></div>"
-        f"</div></div>",
-        unsafe_allow_html=True,
-    )
-
-
-def render_sources(sources: List[str]):
-    if sources:
-        html = " ".join(f"<span class='source-badge'>{s}</span>" for s in sources[:5])
-        st.markdown(f"**Sources:** {html}", unsafe_allow_html=True)
-
-
-def render_features(features: List[str]):
-    if features:
-        html = " ".join(f"<span class='feature-badge'>⚡ {f}</span>" for f in features)
-        st.markdown(html, unsafe_allow_html=True)
-
-
-def render_fact_check(report: dict):
-    if not report:
-        return
-    reliability = report.get("overall_reliability", 0)
-    summary = report.get("verification_summary", "")
-    contradictions = report.get("contradictions", [])
-
-    color_class = (
-        "fact-verified" if reliability >= 0.8
-        else "fact-unverified" if reliability >= 0.5
-        else "fact-contradicted"
-    )
-    icon = "✅" if reliability >= 0.8 else "⚠️" if reliability >= 0.5 else "❌"
-
-    st.markdown(
-        f"<span class='{color_class}'>{icon} Fact Check: {summary}</span>",
-        unsafe_allow_html=True,
-    )
-    if contradictions:
-        with st.expander("⚠️ Contradictions found"):
-            for c in contradictions:
-                st.warning(c)
-
-
-def render_meta(meta: dict):
-    """Render all metadata for a message."""
-    render_sources(meta.get("sources", []))
-
-    if meta.get("confidence") is not None:
-        render_confidence(meta["confidence"])
-
-    if meta.get("fact_check_report"):
-        render_fact_check(meta["fact_check_report"])
-
-    if meta.get("web_search"):
-        st.info("🌐 Web research was performed to improve this answer.")
-
-    if meta.get("response_time_ms"):
-        st.caption(f"⏱️ {meta['response_time_ms']}ms")
-
-    render_features(meta.get("features", []))
-
-    if meta.get("follow_ups"):
-        with st.expander("💡 Suggested follow-ups"):
-            for q in meta["follow_ups"]:
-                st.markdown(f"• {q}")
-
-    if meta.get("conversation_state"):
-        cs = meta["conversation_state"]
-        if cs.get("state") and cs["state"] != "new_topic":
-            st.caption(f"🔀 Conversation: {cs['state']} • Topic: {cs.get('current_topic', '')[:50]}")
+from src.ui.renderers import render_meta
 
 
 # ======================================================================
@@ -448,6 +395,36 @@ def render_meta(meta: dict):
 with st.sidebar:
     st.markdown("# 🧠 Smart RAG")
     st.markdown("*An intelligent assistant that automatically researches, verifies facts, and learns from every conversation.*")
+    st.divider()
+
+    # ── User Identification (Login/Persistence) ─────────────────
+    st.markdown("### 👤 User Identification")
+    
+    from src.database.session_manager import load_sessions as _load_sessions
+    from src.database.session_manager import save_sessions as _save_sessions
+
+    current_id = st.session_state.get("session_id", "")
+    phone_input = st.text_input(
+        "Enter Phone Number", 
+        value=current_id if current_id and len(current_id) < 15 else "", 
+        placeholder="+1234567890",
+        help="Entering a phone number will automatically load your previous chat history."
+    )
+    
+    if phone_input and phone_input != st.session_state.get("session_id"):
+        # The user entered a new phone number. Load their history!
+        st.session_state.session_id = phone_input
+        
+        # Load messages from JSON
+        sessions = _load_sessions()
+        if phone_input in sessions:
+            st.session_state.messages = sessions[phone_input]
+            st.success("Welcome back! Chat history loaded.")
+        else:
+            st.session_state.messages = []
+            st.success("New session created.")
+        st.rerun()
+
     st.divider()
 
     # ── Universal LLM Selection ─────────────────────────────────
@@ -469,7 +446,7 @@ with st.sidebar:
     st.markdown("### 📁 Upload Files")
     uploaded_files = st.file_uploader(
         "Drop PDFs, images, or documents (multiple allowed)",
-        type=["pdf", "png", "jpg", "jpeg", "bmp", "tiff", "webp", "docx"],
+        type=["pdf", "png", "jpg", "jpeg", "bmp", "tiff", "webp", "docx", "doc", "xlsx", "csv", "pptx"],
         key="file_upload",
         accept_multiple_files=True,
     )
@@ -759,6 +736,16 @@ with st.sidebar:
     with col1:
         if st.button("🗑️ Clear Chat", use_container_width=True):
             st.session_state.messages = []
+            
+            # Clear it from the persistent JSON file as well
+            try:
+                sessions_db = _load_sessions()
+                if st.session_state.session_id in sessions_db:
+                    del sessions_db[st.session_state.session_id]
+                    _save_sessions(sessions_db)
+            except Exception:
+                pass
+                
             st.rerun()
 
 
@@ -860,6 +847,7 @@ if user_input or (
                 processed_text,
                 conv_history,
                 active_doc_sites=st.session_state.active_doc_sites,
+                session_id=st.session_state.session_id,
             )
 
         # Show a subtle note if auto deep research was used
@@ -974,4 +962,13 @@ if user_input or (
     st.session_state.messages.append(
         {"role": "assistant", "content": answer, "meta": meta}
     )
+    
+    # Save the updated messages to the JSON file for persistence
+    try:
+        sessions_db = _load_sessions()
+        sessions_db[st.session_state.session_id] = st.session_state.messages
+        _save_sessions(sessions_db)
+    except Exception as e:
+        logger.error(f"Failed to save session: {e}")
+        
     st.rerun()

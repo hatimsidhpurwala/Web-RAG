@@ -40,7 +40,7 @@ def get_llm(temperature: float = 0.0, max_tokens: int = 2000) -> BaseChatModel:
                 api_key = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
             return ChatGoogleGenerativeAI(
                 google_api_key=api_key,
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 temperature=temperature,
                 max_output_tokens=max_tokens,
             )

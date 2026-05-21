@@ -90,16 +90,19 @@ copy config\.env.example config\.env
 python src/utils/indexer.py
 ```
 
-### 4. Run the Streamlit UI
+### 4. Run the Full System (REST API + Streamlit UI)
+
+The easiest way to start both the Universal REST API (FastAPI) and the Streamlit UI simultaneously is using the provided script:
 
 ```bash
-streamlit run src/api/streamlit_app.py
+python run_all.py
 ```
+*This will start the FastAPI backend on `http://localhost:8000` and the Streamlit UI on `http://localhost:8501`.*
 
-### 5. Run the WhatsApp webhook (separate terminal)
-
+### 5. (Alternative) Run separately
+If you only want to run the REST API:
 ```bash
-uvicorn src.api.whatsapp_webhook:app --reload --port 8000
+uvicorn src.api.rest_api:app --reload --port 8000
 ```
 
 ---
@@ -143,16 +146,22 @@ universal-web-scraper/
 │   │   ├── web_searcher.py       # Web search & scraping
 │   │   └── agent_graph.py        # LangGraph orchestrator
 │   ├── core/             # Core Processing
+│   │   ├── document_parser.py    # Universal doc extraction (PDF, Excel, Word, etc)
 │   │   ├── scraper.py            # HTML → Markdown
 │   │   ├── cleaner.py            # Text normalisation
 │   │   ├── chunker.py            # Document chunking
 │   │   └── embedder.py           # Embedding generation
-│   ├── database/         # Databases
+│   ├── database/         # Databases & State
+│   │   ├── session_manager.py    # Centralized persistent JSON chat memory
 │   │   ├── metadata_registry.py  # Stores document profiles
 │   │   └── vector_store.py       # Qdrant operations
-│   ├── api/              # User Interfaces
+│   ├── api/              # API Endpoints
+│   │   ├── rest_api.py           # Universal FastAPI backend
 │   │   ├── streamlit_app.py      # ChatGPT-style UI
 │   │   └── whatsapp_webhook.py   # WhatsApp webhook
+│   ├── ui/               # UI Components
+│   │   ├── renderers.py          # Streamlit UI render helpers
+│   │   └── styles.py             # Global CSS definitions
 │   └── utils/            # Utilities
 │       ├── indexer.py            # Batch indexing
 │       └── assets.py             # Constants

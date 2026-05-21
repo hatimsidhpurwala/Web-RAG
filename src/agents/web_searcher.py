@@ -113,6 +113,7 @@ def search_and_scrape(
     query: str,
     vector_store: VectorStore,
     max_results: int = WEB_SEARCH_MAX_RESULTS,
+    session_id: Optional[str] = None,
 ) -> Dict:
     """Search the web, scrape top results, and index them.
 
@@ -214,7 +215,10 @@ def search_and_scrape(
         markdown = normalize_text(markdown)
         domain    = urlparse(url).netloc.replace("www.", "")
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        site_name = f"web_{domain}_{timestamp}"
+        # Namespace site_name with session_id so each user's web data is
+        # stored under a unique prefix and never retrieved by other users.
+        base_name = f"web_{domain}_{timestamp}"
+        site_name = f"{session_id}:{base_name}" if session_id else base_name
 
         chunks = chunk_markdown(markdown, source_url=url)
         chunks = deduplicate_chunks(chunks)
@@ -279,6 +283,7 @@ def deep_research(
     topic: str,
     vector_store: VectorStore,
     num_queries: int = DEEP_RESEARCH_NUM_QUERIES,
+    session_id: Optional[str] = None,
 ) -> Dict:
     """Perform deep research: generate multiple queries, scrape, and index.
 
@@ -294,7 +299,9 @@ def deep_research(
     total_chunks = 0
 
     for query in queries:
-        info = search_and_scrape(query, vector_store, max_results=2)
+        info = search_and_scrape(
+            query, vector_store, max_results=2, session_id=session_id
+        )
         all_sites.extend(info["sites_indexed"])
         all_raw.extend(info.get("raw_results", []))
         total_chunks += info["total_chunks"]

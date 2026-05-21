@@ -17,7 +17,7 @@ MD_FILES_DIR = DATA_DIR / "md_files"
 QDRANT_LOCAL_DIR = PROJECT_ROOT / "qdrant_local"
 
 # Load environment variables from config/.env
-load_dotenv(CONFIG_DIR / ".env")
+load_dotenv(CONFIG_DIR / ".env", override=True)
 
 # ---------------------------------------------------------------------------
 # API Keys
