@@ -1,53 +1,22 @@
-# Core API
-fastapi>=0.110.0
-uvicorn[standard]==0.27.0
-twilio==9.0.0
-python-multipart==0.0.9
-
-# Environment
-python-dotenv==1.0.1
-
-# AI & LLM
-groq>=0.37.0
-langchain>=1.2.0
-langchain-community>=0.4.0
-langchain-text-splitters>=1.1.0
-langgraph>=1.1.0
-langchain-groq>=1.1.0
-langchain-google-genai>=1.0.0
-langchain-openai>=0.1.0
-langchain-anthropic>=0.1.0
-
-# Embeddings & ML
-sentence-transformers==2.5.1
-torch==2.2.0
-
-# Vector Database
-qdrant-client==1.8.0
-
-# Web Scraping
-beautifulsoup4==4.12.3
-html2text==2024.2.26
-requests==2.31.0
-selenium==4.18.0
-duckduckgo-search>=8.1.1
-
-# Data Processing
-pandas==2.2.1
-tiktoken==0.6.0
-
-# Validation
-pydantic==2.6.3
-
-# Image & Document Processing
-Pillow==10.2.0
-pytesseract==0.3.10
-opencv-python-headless==4.9.0.80
-pypdf==4.0.2
-python-docx==1.1.0
-python-pptx==0.6.23
-openpyxl==3.1.2
-
-# UI
-streamlit==1.32.0
-audio-recorder-streamlit==0.0.10
+fastapi
+uvicorn
+python-multipart
+pydantic
+duckduckgo-search
+beautifulsoup4
+requests
+html2text
+sentence-transformers
+qdrant-client
+groq
+python-docx
+pypdf
+pandas
+openpyxl
+python-pptx
+opencv-python-headless
+pytesseract
+streamlit
+python-dotenv
+openai
+google-generativeai

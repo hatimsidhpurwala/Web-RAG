@@ -1,0 +1,57 @@
+{
+  "fbdba23e-00b5-4db5-bc1e-cff29cae661e": {
+    "history": [
+      {
+        "role": "user",
+        "content": "helllo "
+      },
+      {
+        "role": "assistant",
+        "content": "Hello. How can I assist you today?"
+      }
+    ],
+    "doc_summaries": {}
+  },
+  "+917427068253": {
+    "history": [
+      {
+        "role": "user",
+        "content": "hello "
+      },
+      {
+        "role": "assistant",
+        "content": "Error generating response: 404 models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+      },
+      {
+        "role": "user",
+        "content": "hii "
+      },
+      {
+        "role": "assistant",
+        "content": "Error generating response: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+      }
+    ],
+    "doc_summaries": {}
+  },
+  "+919413601252": {
+    "history": [
+      {
+        "role": "user",
+        "content": "hello "
+      },
+      {
+        "role": "assistant",
+        "content": "Error generating response: 403 Your API key was reported as leaked. Please use another API key."
+      },
+      {
+        "role": "user",
+        "content": "hello "
+      },
+      {
+        "role": "assistant",
+        "content": "Hello. How can I assist you today?"
+      }
+    ],
+    "doc_summaries": {}
+  }
+}
