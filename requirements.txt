@@ -20,3 +20,4 @@ streamlit
 python-dotenv
 openai
 google-generativeai
+psycopg2-binary

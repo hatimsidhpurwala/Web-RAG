@@ -51,8 +51,10 @@ with st.sidebar:
                 data = {"session_id": st.session_state.session_id}
                 try:
                     res = requests.post("http://localhost:8000/api/upload", files=files, data=data)
-                    if res.status_code == 200: st.success(f"Indexed {f.name}")
-                    else: st.error(f"Failed {f.name}: {res.text}")
+                    if res.status_code == 200: 
+                        st.info(f"⏳ {f.name} is indexing in the background. You can start asking questions soon!")
+                    else: 
+                        st.error(f"Failed to upload {f.name}: {res.text}")
                 except Exception as e:
                     st.error(f"API Error: {e}")
             st.session_state.uploaded_docs = True

@@ -1,55 +1,142 @@
 """
 src/storage/session.py
-Chat history and doc summaries per user, stored in a single JSON file.
+Strict PostgreSQL storage for chat logs and document summaries.
 """
 
-import json
-from pathlib import Path
-from typing import Dict, List, Any
+import os
+import logging
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from typing import List, Dict, Any
 
-SESSION_FILE = Path("data/sessions.json")
-MAX_HISTORY = 20
+logger = logging.getLogger(__name__)
 
-def _load() -> Dict[str, Any]:
-    if SESSION_FILE.exists():
-        try: return json.loads(SESSION_FILE.read_text(encoding="utf-8"))
-        except Exception: return {}
-    return {}
+# Default fallback to standard local Postgres credentials for easy setup
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", 
+    "postgresql://postgres:postgres@localhost:5432/web_rag"
+)
 
-def _save(db: Dict[str, Any]) -> None:
-    SESSION_FILE.parent.mkdir(exist_ok=True, parents=True)
-    SESSION_FILE.write_text(json.dumps(db, indent=2), encoding="utf-8")
+def get_connection():
+    """Returns a direct PostgreSQL connection."""
+    try:
+        return psycopg2.connect(DATABASE_URL)
+    except Exception as e:
+        logger.error(f"Failed to connect to PostgreSQL at {DATABASE_URL}: {e}")
+        raise ConnectionError(
+            f"PostgreSQL connection failed. Ensure the server is running and "
+            f"DATABASE_URL is correctly set. Error: {e}"
+        )
 
-def _get_session(session_id: str, db: Dict[str, Any]) -> Dict[str, Any]:
-    if session_id not in db:
-        db[session_id] = {"history": [], "doc_summaries": {}}
-    return db[session_id]
+def init_db() -> None:
+    """Initializes the database schema if tables do not exist."""
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            # Create chat history table
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS chat_history (
+                    id SERIAL PRIMARY KEY,
+                    session_id VARCHAR(50) NOT NULL,
+                    role VARCHAR(20) NOT NULL,
+                    content TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            
+            # Create document summaries table
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS doc_summaries (
+                    session_id VARCHAR(50) NOT NULL,
+                    doc_id VARCHAR(100) NOT NULL,
+                    summary TEXT NOT NULL,
+                    PRIMARY KEY (session_id, doc_id)
+                );
+            """)
+            conn.commit()
+        conn.close()
+        logger.info("PostgreSQL database tables initialized successfully.")
+    except Exception as e:
+        logger.error(f"Error during PostgreSQL table initialization: {e}")
 
-def get_history(session_id: str) -> List[dict]:
-    db = _load()
-    return _get_session(session_id, db).get("history", [])
+def get_history(session_id: str) -> List[Dict[str, str]]:
+    """Loads chat history for a session ID (phone number), keeping the last 20 messages."""
+    history = []
+    try:
+        conn = get_connection()
+        # Use RealDictCursor to return results as clean python dicts
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT role, content FROM chat_history 
+                WHERE session_id = %s 
+                ORDER BY created_at ASC;
+            """, (session_id,))
+            rows = cur.fetchall()
+            for r in rows:
+                history.append({"role": r["role"], "content": r["content"]})
+        conn.close()
+    except Exception as e:
+        logger.error(f"Error loading chat history from PostgreSQL: {e}")
+    # Return last 20 messages to keep LLM context light
+    return history[-20:]
 
 def save_message(session_id: str, role: str, content: str) -> None:
-    db = _load()
-    sess = _get_session(session_id, db)
-    sess["history"].append({"role": role, "content": content})
-    sess["history"] = sess["history"][-MAX_HISTORY:]
-    _save(db)
+    """Appends a new message to the chat log in PostgreSQL."""
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO chat_history (session_id, role, content) 
+                VALUES (%s, %s, %s);
+            """, (session_id, role, content))
+            conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.error(f"Error saving chat message to PostgreSQL: {e}")
 
 def clear_session(session_id: str) -> None:
-    db = _load()
-    if session_id in db:
-        del db[session_id]
-        _save(db)
+    """Deletes all history and summaries for a specific session ID."""
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM chat_history WHERE session_id = %s;", (session_id,))
+            cur.execute("DELETE FROM doc_summaries WHERE session_id = %s;", (session_id,))
+            conn.commit()
+        conn.close()
+        logger.info(f"Cleared session data for session: {session_id}")
+    except Exception as e:
+        logger.error(f"Error clearing session from PostgreSQL: {e}")
 
 def save_doc_summary(session_id: str, doc_id: str, summary: str) -> None:
-    db = _load()
-    sess = _get_session(session_id, db)
-    if "doc_summaries" not in sess: sess["doc_summaries"] = {}
-    sess["doc_summaries"][doc_id] = summary
-    _save(db)
+    """Saves or updates a document summary for a session ID."""
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO doc_summaries (session_id, doc_id, summary)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (session_id, doc_id) 
+                DO UPDATE SET summary = EXCLUDED.summary;
+            """, (session_id, doc_id, summary))
+            conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.error(f"Error saving document summary to PostgreSQL: {e}")
 
 def get_doc_summary(session_id: str, doc_id: str) -> str:
-    db = _load()
-    sess = _get_session(session_id, db)
-    return sess.get("doc_summaries", {}).get(doc_id, "")
+    """Retrieves a document summary for a specific session and document ID."""
+    summary = ""
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT summary FROM doc_summaries 
+                WHERE session_id = %s AND doc_id = %s;
+            """, (session_id, doc_id))
+            row = cur.fetchone()
+            if row:
+                summary = row[0]
+        conn.close()
+    except Exception as e:
+        logger.error(f"Error loading document summary from PostgreSQL: {e}")
+    return summary

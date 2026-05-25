@@ -4,8 +4,9 @@ All FastAPI routes
 """
 
 import pathlib
-
-from fastapi import FastAPI, File, Form, UploadFile, HTTPException
+import logging
+from typing import Optional
+from fastapi import FastAPI, File, Form, UploadFile, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.agent.pipeline import RAGAgent
@@ -13,6 +14,8 @@ from src.ingestion.parser import parse, transcribe_audio, extract_from_image
 from src.ingestion.chunker import process
 from src.storage.vector_store import VectorStore, embed_chunks
 from src.api.webhook import router as webhook_router
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Universal Scraper API")
 
@@ -46,22 +49,41 @@ async def ask(body: AskRequest):
     return {"answer": answer}
 
 
-@app.post("/api/upload")
-async def upload(file: UploadFile = File(...), session_id: str = Form(...)):
-    raw = await file.read()
-    filename = file.filename or "file"
+def index_in_background(raw: bytes, filename: str, session_id: str):
+    """Asynchronously parses, chunks, embeds, and stores the file."""
     try:
         text = parse(raw, filename)
-    except ValueError as e:
-        raise HTTPException(status_code=415, detail=str(e))
+        chunks_str = process(text)
+        if chunks_str:
+            site_name = f"{session_id}:doc:{filename}"
+            chunks = [{"text": c, "source_url": filename} for c in chunks_str]
+            chunks = embed_chunks(chunks)
+            vector_store.store_chunks_for_site(chunks, site_name)
+            logger.info(f"Background indexing completed for file: {filename} ({len(chunks_str)} chunks)")
+    except Exception as e:
+        logger.error(f"Error during background indexing of {filename}: {e}")
 
-    chunks_str = process(text)
-    if chunks_str:
-        site_name = f"{session_id}:doc:{filename}"
-        chunks = [{"text": c, "source_url": filename} for c in chunks_str]
-        chunks = embed_chunks(chunks)
-        vector_store.store_chunks_for_site(chunks, site_name)
-    return {"status": "ok", "chunks": len(chunks_str)}
+@app.post("/api/upload")
+async def upload(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...), 
+    session_id: str = Form(...)
+):
+    raw = await file.read()
+    filename = file.filename or "file"
+    
+    # Quick early validation of file extension
+    ext = pathlib.Path(filename).suffix.lower()
+    if ext not in [".pdf", ".docx", ".xlsx", ".xls", ".pptx", ".txt", ".png", ".jpg", ".jpeg", ".wav", ".mp3"]:
+        raise HTTPException(status_code=415, detail=f"Unsupported file format: {ext}")
+        
+    # Queue the heavy indexing task to run in the background immediately
+    background_tasks.add_task(index_in_background, raw, filename, session_id)
+    
+    return {
+        "status": "processing", 
+        "message": f"Successfully queued '{filename}' for background parsing and indexing."
+    }
 
 
 @app.post("/api/voice")

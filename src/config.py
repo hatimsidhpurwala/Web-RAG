@@ -98,3 +98,11 @@ def llm_completion(provider: str, messages: list, temperature: float = 0.2, max_
         
         res = m.generate_content(formatted_messages, generation_config=generation_config)
         return res.text
+
+# Auto-initialize Postgres Database on application start
+try:
+    from src.storage.session import init_db
+    init_db()
+except Exception as e:
+    logger.warning(f"Database auto-initialization skipped or failed: {e}")
+
