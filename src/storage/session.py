@@ -5,20 +5,24 @@ Strict PostgreSQL storage for chat logs and document summaries.
 
 import os
 import logging
+from pathlib import Path
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from typing import List, Dict, Any
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
-# Default fallback to standard local Postgres credentials for easy setup
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql://postgres:postgres@localhost:5432/web_rag"
-)
+# Ensure config/.env is loaded before reading variables
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+load_dotenv(PROJECT_ROOT / "config" / ".env", override=True)
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_connection():
     """Returns a direct PostgreSQL connection."""
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL is not set in config/.env")
     try:
         return psycopg2.connect(DATABASE_URL)
     except Exception as e:
@@ -140,3 +144,6 @@ def get_doc_summary(session_id: str, doc_id: str) -> str:
     except Exception as e:
         logger.error(f"Error loading document summary from PostgreSQL: {e}")
     return summary
+
+# Auto-initialize tables when the module is imported
+init_db()
